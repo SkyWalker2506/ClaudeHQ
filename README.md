@@ -106,4 +106,15 @@ ClaudeHQ (you are here)
 
 ---
 
+## Ecosystem
+
+| Repo | Description |
+|------|-------------|
+| [claude-config](https://github.com/SkyWalker2506/claude-config) | Multi-Agent OS — 134 agents, local-first routing, cost-aware orchestration |
+| [claude-marketplace](https://github.com/SkyWalker2506/claude-marketplace) | Claude Code Plugin Marketplace — 18 plugins, one-command install |
+| [claude-agent-catalog](https://github.com/SkyWalker2506/claude-agent-catalog) | Agent catalog — 134 agents across 15 categories |
+| [sdk-market](https://github.com/SkyWalker2506/sdk-market) | SDK Market — production-ready kits for Flutter and beyond |
+
+---
+
 *Built with Claude Code by Musab Kara*
