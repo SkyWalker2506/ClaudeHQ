@@ -23,6 +23,43 @@ ClaudeHQ, Musab Kara'nin Claude ekosisteminin merkezi calisma alanidir. Buradan 
 - Bu workspace'in Jira projesi: **CHQ**
 - Proje bazli Jira key'leri `projects.json`'da tanimli
 
+## HQ Proje Yonetimi
+
+ClaudeHQ, tum projeleri merkezi olarak yonetir. `~/Projects` altinda CLAUDE.md olan her klasor otomatik proje olarak taninir.
+
+### Komutlar
+
+- `./scripts/hq scan` — ~/Projects tara, projects.json olustur/guncelle
+- `./scripts/hq new <isim> [--jira KEY]` — Yeni proje olustur (git, CLAUDE.md, sprint dahil)
+- `./scripts/hq dispatch <proje>` — Tek proje icin Claude session baslat
+- `./scripts/hq dispatch --all` — Tum aktif projeler icin toplu session baslat
+- `./scripts/hq status [proje]` — Durum dashboard'u goster
+- `./scripts/hq sprint plan <proje>` — Sprint planlama session'i baslat
+- `./scripts/hq sprint list [proje]` — Sprint'leri listele
+- `./scripts/hq sprint init <proje>` — Proje icin sprint tracking baslat
+- `./scripts/hq monitor [--watch]` — Calisan session'lari izle
+- `./scripts/hq stuck` — Takilan projeleri goster
+- `./scripts/hq archive <proje>` — Projeyi pasife al
+- `./scripts/hq activate <proje>` — Projeyi aktife al
+- `./scripts/hq config [proje]` — Proje konfigurasyonunu goster
+- `./scripts/hq logs <proje>` — Session loglarini goster
+
+### Dosya Yapisi
+
+- `projects.json` — Otomatik kesfedilen projeler (gitignored, `hq scan` ile olusur)
+- `sprints/{proje}/sprint-{N}.json` — Sprint tanimlari ve task'lar
+- `progress/{proje}.json` — Otomatik ilerleme takibi (gitignored)
+- `templates/` — Sprint ve task prompt sablonlari
+
+### Tipik Workflow
+
+1. `hq scan` — Projeleri kesfet (veya `hq new <isim>` ile yeni proje ac)
+2. `hq sprint init <proje>` — Sprint dosyasi olustur, task'lari tanimla
+3. `hq dispatch <proje|--all>` — Claude session'larini baslat
+4. `hq monitor --watch` — Ilerlemeyi izle
+5. `hq stuck` — Takilan projeleri kontrol et
+6. `hq logs <proje>` — Detayli log incele
+
 ## Yeni proje kurma
 
 1. `mkdir ~/Projects/<proje-adi>`

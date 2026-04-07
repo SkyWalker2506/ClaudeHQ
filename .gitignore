@@ -1,4 +1,5 @@
 projects.json
+progress/
 .claude/
 *.env
 .DS_Store

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "VocabLearningApp",
+    "path": "/home/user/Projects/VocabLearningApp",
+    "jira": "VOC",
+    "git": "SkyWalker2506/VocabLearningApp",
+    "active": true,
+    "currentSprint": 1,
+    "discoveredAt": "2026-04-07"
+  },
+  {
+    "name": "trading-bot",
+    "path": "/home/user/Projects/trading-bot",
+    "jira": null,
+    "git": "SkyWalker2506/trading-bot",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-07"
+  }
+]

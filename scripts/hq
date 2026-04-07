@@ -1,0 +1,904 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ClaudeHQ — Central Project Management CLI
+# Usage: hq <command> [options]
+
+HQ_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECTS_ROOT="${HQ_PROJECTS_ROOT:-$HOME/Projects}"
+PROGRESS_DIR="$HQ_DIR/progress"
+SPRINTS_DIR="$HQ_DIR/sprints"
+PROJECTS_FILE="$HQ_DIR/projects.json"
+TEMPLATES_DIR="$HQ_DIR/templates"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+GRAY='\033[0;90m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+usage() {
+    cat <<EOF
+${BOLD}ClaudeHQ — Project Management CLI${NC}
+
+${BOLD}Usage:${NC} hq <command> [options]
+
+${BOLD}Commands:${NC}
+  scan                        Scan ~/Projects for CLAUDE.md projects
+  new <name> [--jira KEY]     Create a new project with full ecosystem setup
+  dispatch <project|--all>    Launch Claude session(s) for project(s)
+  status [project]            Show project status dashboard
+  sprint plan <project>       Launch sprint planning session
+  sprint list [project]       List sprints
+  sprint init <project>       Initialize sprint tracking for a project
+  monitor [--watch]           Watch running sessions
+  stuck                       Show stuck/blocked projects
+  archive <project>           Mark project as inactive
+  activate <project>          Mark project as active
+  config [project]            Show/edit project configuration
+  logs <project>              Show session logs for a project
+
+${BOLD}Options:${NC}
+  --dry-run                   Show what would happen without executing
+  --help, -h                  Show this help message
+
+${BOLD}Environment:${NC}
+  HQ_PROJECTS_ROOT            Override projects root (default: ~/Projects)
+
+${BOLD}Examples:${NC}
+  hq scan                     Discover all projects
+  hq new my-app --jira MA     Create new project
+  hq dispatch VocabLearningApp
+  hq dispatch --all           Launch all active projects
+  hq status                   Show dashboard
+  hq monitor --watch          Live monitoring
+  hq logs trading-bot         Show logs
+  hq archive old-project      Deactivate project
+EOF
+}
+
+# --- SCAN ---
+cmd_scan() {
+    if [[ ! -d "$PROJECTS_ROOT" ]]; then
+        echo -e "${RED}Error:${NC} Projects root not found: $PROJECTS_ROOT"
+        echo "Set HQ_PROJECTS_ROOT or create $PROJECTS_ROOT"
+        exit 1
+    fi
+
+    echo -e "${BLUE}Scanning${NC} $PROJECTS_ROOT for CLAUDE.md projects..."
+
+    local projects="[]"
+    local count=0
+
+    while IFS= read -r claude_md; do
+        local project_dir
+        project_dir="$(dirname "$claude_md")"
+        local project_name
+        project_name="$(basename "$project_dir")"
+
+        # Skip ClaudeHQ itself
+        if [[ "$project_name" == "ClaudeHQ" ]]; then
+            continue
+        fi
+
+        # Extract git remote
+        local git_remote=""
+        if [[ -f "$project_dir/.git/config" ]]; then
+            git_remote=$(grep -A1 '\[remote "origin"\]' "$project_dir/.git/config" 2>/dev/null | grep url | sed 's/.*github.com[:/]\(.*\)\.git/\1/' | sed 's/.*github.com[:/]\(.*\)/\1/' | tr -d '[:space:]' || true)
+        fi
+
+        # Extract jira key from .claude/index.md
+        local jira_key=""
+        if [[ -f "$project_dir/.claude/index.md" ]]; then
+            jira_key=$(grep -i '^jira:' "$project_dir/.claude/index.md" 2>/dev/null | head -1 | sed 's/^jira:[[:space:]]*//' | tr -d '[:space:]' || true)
+        fi
+
+        # Check if already in projects.json to preserve active/sprint state
+        local existing_active="true"
+        local existing_sprint="null"
+        if [[ -f "$PROJECTS_FILE" ]]; then
+            existing_active=$(jq -r --arg name "$project_name" '.[] | select(.name == $name) | .active // true' "$PROJECTS_FILE" 2>/dev/null || echo "true")
+            existing_sprint=$(jq -r --arg name "$project_name" '.[] | select(.name == $name) | .currentSprint // null' "$PROJECTS_FILE" 2>/dev/null || echo "null")
+            [[ -z "$existing_active" ]] && existing_active="true"
+            [[ -z "$existing_sprint" ]] && existing_sprint="null"
+        fi
+
+        # Build project entry
+        local entry
+        entry=$(jq -n \
+            --arg name "$project_name" \
+            --arg path "$project_dir" \
+            --arg jira "$jira_key" \
+            --arg git "$git_remote" \
+            --argjson active "$existing_active" \
+            --argjson sprint "$existing_sprint" \
+            --arg date "$(date +%Y-%m-%d)" \
+            '{
+                name: $name,
+                path: $path,
+                jira: (if $jira == "" then null else $jira end),
+                git: (if $git == "" then null else $git end),
+                active: $active,
+                currentSprint: $sprint,
+                discoveredAt: $date
+            }')
+
+        projects=$(echo "$projects" | jq --argjson entry "$entry" '. + [$entry]')
+        count=$((count + 1))
+
+        echo -e "  ${GREEN}+${NC} $project_name $([ -n "$jira_key" ] && echo "[${jira_key}]" || true) $([ -n "$git_remote" ] && echo "($git_remote)" || true)"
+
+    done < <(find "$PROJECTS_ROOT" -maxdepth 2 -name "CLAUDE.md" -not -path "*/node_modules/*" 2>/dev/null | sort)
+
+    # Write projects.json
+    echo "$projects" | jq '.' > "$PROJECTS_FILE"
+
+    echo ""
+    echo -e "${GREEN}Found $count project(s).${NC} Written to projects.json"
+}
+
+# --- DISPATCH ---
+cmd_dispatch() {
+    local target="${1:-}"
+    local dry_run=false
+
+    # Parse flags
+    for arg in "$@"; do
+        case "$arg" in
+            --dry-run) dry_run=true ;;
+        esac
+    done
+
+    if [[ -z "$target" ]]; then
+        echo -e "${RED}Usage:${NC} hq dispatch <project|--all> [--dry-run]"
+        exit 1
+    fi
+
+    if [[ ! -f "$PROJECTS_FILE" ]]; then
+        echo -e "${RED}Error:${NC} projects.json not found. Run 'hq scan' first."
+        exit 1
+    fi
+
+    mkdir -p "$PROGRESS_DIR"
+
+    if [[ "$target" == "--all" ]]; then
+        local project_names
+        project_names=$(jq -r '.[] | select(.active == true) | .name' "$PROJECTS_FILE")
+
+        if [[ -z "$project_names" ]]; then
+            echo -e "${YELLOW}No active projects found.${NC}"
+            exit 0
+        fi
+
+        echo -e "${BLUE}Dispatching all active projects...${NC}"
+        while IFS= read -r name; do
+            dispatch_project "$name" "$dry_run"
+        done <<< "$project_names"
+    else
+        dispatch_project "$target" "$dry_run"
+    fi
+}
+
+dispatch_project() {
+    local project_name="$1"
+    local dry_run="${2:-false}"
+
+    # Get project info
+    local project_path
+    project_path=$(jq -r --arg name "$project_name" '.[] | select(.name == $name) | .path' "$PROJECTS_FILE")
+
+    if [[ -z "$project_path" || "$project_path" == "null" ]]; then
+        echo -e "${RED}Error:${NC} Project '$project_name' not found in projects.json"
+        return 1
+    fi
+
+    # Build prompt
+    local prompt
+    prompt=$("$HQ_DIR/scripts/dispatch.sh" build-prompt "$project_name")
+
+    if [[ "$dry_run" == "true" ]]; then
+        echo -e "${YELLOW}[DRY RUN]${NC} $project_name"
+        echo -e "${GRAY}Path:${NC} $project_path"
+        echo -e "${GRAY}Prompt:${NC}"
+        echo "$prompt"
+        echo "---"
+        return 0
+    fi
+
+    echo -e "${BLUE}Dispatching${NC} $project_name..."
+
+    # Write initial progress
+    local progress_file="$PROGRESS_DIR/${project_name}.json"
+    jq -n \
+        --arg name "$project_name" \
+        --arg status "dispatching" \
+        --arg time "$(date -Iseconds)" \
+        '{project: $name, status: $status, startedAt: $time, pid: null, lastUpdate: $time}' \
+        > "$progress_file"
+
+    # Launch Claude in background
+    "$HQ_DIR/scripts/dispatch.sh" run "$project_name" &
+    local pid=$!
+
+    # Update progress with PID
+    jq --argjson pid "$pid" '.pid = $pid | .status = "running"' "$progress_file" > "${progress_file}.tmp" && mv "${progress_file}.tmp" "$progress_file"
+
+    echo -e "  ${GREEN}Started${NC} $project_name (PID: $pid)"
+}
+
+# --- STATUS ---
+cmd_status() {
+    local filter="${1:-}"
+
+    if [[ ! -f "$PROJECTS_FILE" ]]; then
+        echo -e "${YELLOW}No projects found.${NC} Run 'hq scan' first."
+        exit 0
+    fi
+
+    local projects
+    projects=$(jq -r '.[] | .name' "$PROJECTS_FILE")
+
+    if [[ -z "$projects" ]]; then
+        echo -e "${YELLOW}No projects in projects.json.${NC}"
+        exit 0
+    fi
+
+    # Header
+    printf "\n${BOLD}%-25s %-10s %-10s %-12s %-15s${NC}\n" "PROJECT" "SPRINT" "TASKS" "STATUS" "LAST UPDATE"
+    printf "%-25s %-10s %-10s %-12s %-15s\n" "-------" "------" "-----" "------" "-----------"
+
+    while IFS= read -r name; do
+        # Skip if filter specified and doesn't match
+        if [[ -n "$filter" && "$name" != "$filter" ]]; then
+            continue
+        fi
+
+        local sprint="-"
+        local tasks="-"
+        local status="idle"
+        local last_update="-"
+        local status_color="$GRAY"
+
+        # Check sprint info
+        local active_sprint
+        active_sprint=$(jq -r --arg name "$name" '.[] | select(.name == $name) | .currentSprint // empty' "$PROJECTS_FILE" 2>/dev/null || true)
+        if [[ -n "$active_sprint" && "$active_sprint" != "null" ]]; then
+            sprint="S$active_sprint"
+
+            # Count tasks
+            local sprint_file="$SPRINTS_DIR/$name/sprint-${active_sprint}.json"
+            if [[ -f "$sprint_file" ]]; then
+                local total done_count
+                total=$(jq '.tasks | length' "$sprint_file" 2>/dev/null || echo 0)
+                done_count=$(jq '[.tasks[] | select(.status == "done")] | length' "$sprint_file" 2>/dev/null || echo 0)
+                tasks="${done_count}/${total}"
+            fi
+        fi
+
+        # Check progress
+        local progress_file="$PROGRESS_DIR/${name}.json"
+        if [[ -f "$progress_file" ]]; then
+            status=$(jq -r '.status // "unknown"' "$progress_file" 2>/dev/null || echo "unknown")
+
+            local update_time
+            update_time=$(jq -r '.lastUpdate // empty' "$progress_file" 2>/dev/null || true)
+            if [[ -n "$update_time" ]]; then
+                local now update_epoch diff
+                now=$(date +%s)
+                update_epoch=$(date -d "$update_time" +%s 2>/dev/null || echo "$now")
+                diff=$(( now - update_epoch ))
+
+                if (( diff < 60 )); then
+                    last_update="${diff}s ago"
+                elif (( diff < 3600 )); then
+                    last_update="$(( diff / 60 ))m ago"
+                elif (( diff < 86400 )); then
+                    last_update="$(( diff / 3600 ))h ago"
+                else
+                    last_update="$(( diff / 86400 ))d ago"
+                fi
+            fi
+        fi
+
+        # Color based on status
+        case "$status" in
+            running|dispatching) status_color="$YELLOW" ;;
+            done|completed)      status_color="$GREEN" ;;
+            stuck|failed|error)  status_color="$RED" ;;
+            idle|unknown)        status_color="$GRAY" ;;
+        esac
+
+        printf "%-25s %-10s %-10s ${status_color}%-12s${NC} %-15s\n" "$name" "$sprint" "$tasks" "$status" "$last_update"
+
+    done <<< "$projects"
+    echo ""
+}
+
+# --- SPRINT ---
+cmd_sprint() {
+    local subcmd="${1:-}"
+    local project="${2:-}"
+
+    case "$subcmd" in
+        plan)
+            if [[ -z "$project" ]]; then
+                echo -e "${RED}Usage:${NC} hq sprint plan <project>"
+                exit 1
+            fi
+            sprint_plan "$project"
+            ;;
+        list)
+            sprint_list "$project"
+            ;;
+        init)
+            if [[ -z "$project" ]]; then
+                echo -e "${RED}Usage:${NC} hq sprint init <project>"
+                exit 1
+            fi
+            sprint_init "$project"
+            ;;
+        *)
+            echo -e "${RED}Usage:${NC} hq sprint <plan|list|init> [project]"
+            exit 1
+            ;;
+    esac
+}
+
+sprint_init() {
+    local project="$1"
+    local sprint_dir="$SPRINTS_DIR/$project"
+    mkdir -p "$sprint_dir"
+
+    if [[ -f "$sprint_dir/sprint-1.json" ]]; then
+        echo -e "${YELLOW}Sprint 1 already exists for $project.${NC}"
+        return 0
+    fi
+
+    # Copy template
+    local template="$TEMPLATES_DIR/sprint.json"
+    if [[ ! -f "$template" ]]; then
+        echo -e "${RED}Error:${NC} Sprint template not found at $template"
+        exit 1
+    fi
+
+    jq --arg project "$project" --arg date "$(date +%Y-%m-%d)" \
+        '.project = $project | .startDate = $date' \
+        "$template" > "$sprint_dir/sprint-1.json"
+
+    # Update currentSprint in projects.json
+    if [[ -f "$PROJECTS_FILE" ]]; then
+        jq --arg name "$project" '(.[] | select(.name == $name) | .currentSprint) = 1' "$PROJECTS_FILE" > "${PROJECTS_FILE}.tmp" && mv "${PROJECTS_FILE}.tmp" "$PROJECTS_FILE"
+    fi
+
+    echo -e "${GREEN}Initialized${NC} sprint 1 for $project"
+    echo "Edit: $sprint_dir/sprint-1.json"
+}
+
+sprint_plan() {
+    local project="$1"
+
+    if [[ ! -f "$PROJECTS_FILE" ]]; then
+        echo -e "${RED}Error:${NC} projects.json not found. Run 'hq scan' first."
+        exit 1
+    fi
+
+    local project_path
+    project_path=$(jq -r --arg name "$project" '.[] | select(.name == $name) | .path' "$PROJECTS_FILE")
+
+    if [[ -z "$project_path" || "$project_path" == "null" ]]; then
+        echo -e "${RED}Error:${NC} Project '$project' not found."
+        exit 1
+    fi
+
+    local prompt_template="$TEMPLATES_DIR/task-prompts/plan-sprint.md"
+    if [[ ! -f "$prompt_template" ]]; then
+        echo -e "${RED}Error:${NC} plan-sprint.md template not found."
+        exit 1
+    fi
+
+    local sprint_dir="$SPRINTS_DIR/$project"
+    mkdir -p "$sprint_dir"
+
+    # Determine next sprint number
+    local next_sprint=1
+    local latest
+    latest=$(ls "$sprint_dir"/sprint-*.json 2>/dev/null | sort -V | tail -1 || true)
+    if [[ -n "$latest" ]]; then
+        next_sprint=$(( $(basename "$latest" | grep -oP '\d+') + 1 ))
+    fi
+
+    local prompt
+    prompt=$(sed \
+        -e "s|{{PROJECT_NAME}}|$project|g" \
+        -e "s|{{PROJECT_PATH}}|$project_path|g" \
+        -e "s|{{SPRINT_NUMBER}}|$next_sprint|g" \
+        -e "s|{{SPRINT_DIR}}|$sprint_dir|g" \
+        "$prompt_template")
+
+    echo -e "${BLUE}Launching sprint planning for $project (Sprint $next_sprint)...${NC}"
+
+    cd "$project_path"
+    claude -p \
+        --model sonnet \
+        --name "hq-sprint-$project" \
+        --append-system-prompt "$prompt" \
+        "Plan sprint $next_sprint for this project. Analyze the codebase, identify priorities, and create the sprint file."
+}
+
+sprint_list() {
+    local filter="${1:-}"
+
+    if [[ ! -d "$SPRINTS_DIR" ]]; then
+        echo -e "${YELLOW}No sprints directory found.${NC}"
+        exit 0
+    fi
+
+    echo -e "\n${BOLD}Sprints:${NC}\n"
+
+    for project_dir in "$SPRINTS_DIR"/*/; do
+        [[ ! -d "$project_dir" ]] && continue
+        local project_name
+        project_name=$(basename "$project_dir")
+
+        if [[ -n "$filter" && "$project_name" != "$filter" ]]; then
+            continue
+        fi
+
+        echo -e "${BOLD}$project_name${NC}"
+
+        for sprint_file in "$project_dir"/sprint-*.json; do
+            [[ ! -f "$sprint_file" ]] && continue
+            local num status goal total done_count
+            num=$(jq -r '.sprint' "$sprint_file")
+            status=$(jq -r '.status' "$sprint_file")
+            goal=$(jq -r '.goal // "-"' "$sprint_file")
+            total=$(jq '.tasks | length' "$sprint_file")
+            done_count=$(jq '[.tasks[] | select(.status == "done")] | length' "$sprint_file")
+
+            local status_color="$GRAY"
+            case "$status" in
+                active)    status_color="$YELLOW" ;;
+                completed) status_color="$GREEN" ;;
+                planning)  status_color="$BLUE" ;;
+            esac
+
+            printf "  Sprint %-3s ${status_color}%-12s${NC} [%s/%s] %s\n" "$num" "$status" "$done_count" "$total" "$goal"
+        done
+        echo ""
+    done
+}
+
+# --- MONITOR ---
+cmd_monitor() {
+    local watch=false
+
+    for arg in "$@"; do
+        case "$arg" in
+            --watch) watch=true ;;
+        esac
+    done
+
+    if [[ "$watch" == "true" ]]; then
+        while true; do
+            clear
+            echo -e "${BOLD}ClaudeHQ Monitor${NC} — $(date '+%H:%M:%S')"
+            echo ""
+            show_monitor_table
+            echo -e "${GRAY}Refreshing every 30s... (Ctrl+C to stop)${NC}"
+            sleep 30
+        done
+    else
+        show_monitor_table
+    fi
+}
+
+show_monitor_table() {
+    if [[ ! -d "$PROGRESS_DIR" ]] || ! ls "$PROGRESS_DIR"/*.json >/dev/null 2>&1; then
+        echo -e "${YELLOW}No active sessions.${NC}"
+        return 0
+    fi
+
+    printf "${BOLD}%-25s %-8s %-12s %-15s %-10s${NC}\n" "PROJECT" "PID" "STATUS" "LAST UPDATE" "DURATION"
+    printf "%-25s %-8s %-12s %-15s %-10s\n" "-------" "---" "------" "-----------" "--------"
+
+    for progress_file in "$PROGRESS_DIR"/*.json; do
+        [[ ! -f "$progress_file" ]] && continue
+
+        local name pid status started last_update
+        name=$(jq -r '.project' "$progress_file")
+        pid=$(jq -r '.pid // "-"' "$progress_file")
+        status=$(jq -r '.status // "unknown"' "$progress_file")
+        started=$(jq -r '.startedAt // empty' "$progress_file" 2>/dev/null || true)
+        last_update=$(jq -r '.lastUpdate // empty' "$progress_file" 2>/dev/null || true)
+
+        # Check if PID is still alive
+        if [[ "$pid" != "-" && "$pid" != "null" ]]; then
+            if ! kill -0 "$pid" 2>/dev/null; then
+                if [[ "$status" == "running" || "$status" == "dispatching" ]]; then
+                    status="finished"
+                    jq '.status = "finished"' "$progress_file" > "${progress_file}.tmp" && mv "${progress_file}.tmp" "$progress_file"
+                fi
+            fi
+        fi
+
+        # Check for stuck (>10 min without update)
+        if [[ -n "$last_update" && "$status" == "running" ]]; then
+            local now update_epoch diff
+            now=$(date +%s)
+            update_epoch=$(date -d "$last_update" +%s 2>/dev/null || echo "$now")
+            diff=$(( now - update_epoch ))
+            if (( diff > 600 )); then
+                status="stuck"
+                jq '.status = "stuck"' "$progress_file" > "${progress_file}.tmp" && mv "${progress_file}.tmp" "$progress_file"
+            fi
+        fi
+
+        # Duration
+        local duration="-"
+        if [[ -n "$started" ]]; then
+            local now start_epoch
+            now=$(date +%s)
+            start_epoch=$(date -d "$started" +%s 2>/dev/null || echo "$now")
+            local dur=$(( now - start_epoch ))
+            if (( dur < 60 )); then
+                duration="${dur}s"
+            elif (( dur < 3600 )); then
+                duration="$(( dur / 60 ))m"
+            else
+                duration="$(( dur / 3600 ))h$(( (dur % 3600) / 60 ))m"
+            fi
+        fi
+
+        # Format last update
+        local update_str="-"
+        if [[ -n "$last_update" ]]; then
+            local now update_epoch diff
+            now=$(date +%s)
+            update_epoch=$(date -d "$last_update" +%s 2>/dev/null || echo "$now")
+            diff=$(( now - update_epoch ))
+            if (( diff < 60 )); then
+                update_str="${diff}s ago"
+            elif (( diff < 3600 )); then
+                update_str="$(( diff / 60 ))m ago"
+            else
+                update_str="$(( diff / 3600 ))h ago"
+            fi
+        fi
+
+        local status_color="$GRAY"
+        case "$status" in
+            running|dispatching) status_color="$YELLOW" ;;
+            done|completed|finished) status_color="$GREEN" ;;
+            stuck|failed|error) status_color="$RED" ;;
+        esac
+
+        printf "%-25s %-8s ${status_color}%-12s${NC} %-15s %-10s\n" "$name" "$pid" "$status" "$update_str" "$duration"
+    done
+    echo ""
+}
+
+# --- STUCK ---
+cmd_stuck() {
+    if [[ ! -d "$PROGRESS_DIR" ]] || ! ls "$PROGRESS_DIR"/*.json >/dev/null 2>&1; then
+        echo -e "${GREEN}No stuck projects.${NC}"
+        return 0
+    fi
+
+    local found=false
+
+    echo -e "\n${BOLD}Stuck / Blocked Projects:${NC}\n"
+
+    for progress_file in "$PROGRESS_DIR"/*.json; do
+        [[ ! -f "$progress_file" ]] && continue
+
+        local name status pid last_update
+        name=$(jq -r '.project' "$progress_file")
+        status=$(jq -r '.status // "unknown"' "$progress_file")
+        pid=$(jq -r '.pid // "-"' "$progress_file")
+        last_update=$(jq -r '.lastUpdate // empty' "$progress_file" 2>/dev/null || true)
+
+        local is_stuck=false
+
+        # Check explicit stuck/failed status
+        if [[ "$status" == "stuck" || "$status" == "failed" || "$status" == "error" ]]; then
+            is_stuck=true
+        fi
+
+        # Check PID dead but status still running
+        if [[ "$pid" != "-" && "$pid" != "null" && "$status" == "running" ]]; then
+            if ! kill -0 "$pid" 2>/dev/null; then
+                is_stuck=true
+                status="dead-process"
+            fi
+        fi
+
+        # Check timeout (>10 min without update)
+        if [[ -n "$last_update" && "$status" == "running" ]]; then
+            local now update_epoch diff
+            now=$(date +%s)
+            update_epoch=$(date -d "$last_update" +%s 2>/dev/null || echo "$now")
+            diff=$(( now - update_epoch ))
+            if (( diff > 600 )); then
+                is_stuck=true
+                status="timeout"
+            fi
+        fi
+
+        if [[ "$is_stuck" == "true" ]]; then
+            found=true
+            echo -e "  ${RED}*${NC} ${BOLD}$name${NC} — status: $status (PID: $pid)"
+
+            # Show log tail if exists
+            local log_file="$PROGRESS_DIR/${name}.log"
+            if [[ -f "$log_file" ]]; then
+                echo -e "    ${GRAY}Last output:${NC}"
+                tail -3 "$log_file" 2>/dev/null | sed 's/^/    /'
+            fi
+            echo ""
+        fi
+    done
+
+    if [[ "$found" == "false" ]]; then
+        echo -e "  ${GREEN}No stuck projects!${NC}"
+    fi
+    echo ""
+}
+
+# --- NEW PROJECT ---
+cmd_new() {
+    local project_name=""
+    local jira_key=""
+    local git_org="SkyWalker2506"
+    local template=""
+
+    # Parse args
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --jira)  jira_key="${2:-}"; shift 2 ;;
+            --git-org) git_org="${2:-}"; shift 2 ;;
+            --template) template="${2:-}"; shift 2 ;;
+            -*) echo -e "${RED}Unknown option:${NC} $1"; exit 1 ;;
+            *)  project_name="$1"; shift ;;
+        esac
+    done
+
+    if [[ -z "$project_name" ]]; then
+        echo -e "${RED}Usage:${NC} hq new <project-name> [--jira KEY] [--git-org ORG] [--template NAME]"
+        exit 1
+    fi
+
+    local project_path="$PROJECTS_ROOT/$project_name"
+
+    if [[ -d "$project_path" ]]; then
+        echo -e "${RED}Error:${NC} Directory already exists: $project_path"
+        exit 1
+    fi
+
+    echo -e "${BLUE}Creating project${NC} $project_name..."
+
+    # 1. Create directory and init git
+    mkdir -p "$project_path"
+    cd "$project_path"
+    git init -q
+
+    echo -e "  ${GREEN}+${NC} Created $project_path"
+    echo -e "  ${GREEN}+${NC} Initialized git repository"
+
+    # 2. Create CLAUDE.md
+    cat > "$project_path/CLAUDE.md" <<CLAUDEMD
+# $project_name
+
+## Bu proje nedir
+
+$project_name projesi.
+
+## Kurallar
+
+- Commit mesajlari aciklayici olsun
+- Test yazmayi unutma
+- PR acmadan once lint kontrol et
+CLAUDEMD
+    echo -e "  ${GREEN}+${NC} Created CLAUDE.md"
+
+    # 3. Create .claude/index.md
+    mkdir -p "$project_path/.claude"
+    cat > "$project_path/.claude/index.md" <<INDEXMD
+---
+project: $project_name
+stack:
+jira: ${jira_key:-}
+git: ${git_org}/${project_name}
+---
+$project_name projesi.
+INDEXMD
+    echo -e "  ${GREEN}+${NC} Created .claude/index.md"
+
+    # 4. Create .gitignore
+    cat > "$project_path/.gitignore" <<GITIGNORE
+.env
+.env.*
+*.env
+.DS_Store
+node_modules/
+.claude/
+GITIGNORE
+    echo -e "  ${GREEN}+${NC} Created .gitignore"
+
+    # 5. Create README.md
+    cat > "$project_path/README.md" <<README
+# $project_name
+
+> Created via ClaudeHQ
+
+## Setup
+
+\`\`\`bash
+cd $project_path
+claude
+\`\`\`
+README
+    echo -e "  ${GREEN}+${NC} Created README.md"
+
+    # 6. Run claude-config install if available
+    local config_installer="$PROJECTS_ROOT/claude-config/install.sh"
+    if [[ -x "$config_installer" ]]; then
+        echo -e "  ${BLUE}Running${NC} claude-config install..."
+        cd "$PROJECTS_ROOT/claude-config" && ./install.sh 2>/dev/null || true
+        echo -e "  ${GREEN}+${NC} claude-config installed"
+    fi
+
+    # 7. Initial commit
+    cd "$project_path"
+    git add -A
+    git commit -q -m "Initial project setup via ClaudeHQ"
+    echo -e "  ${GREEN}+${NC} Initial commit created"
+
+    # 8. Create GitHub repo if gh is available
+    if command -v gh &>/dev/null; then
+        echo -e "  ${BLUE}Creating${NC} GitHub repo ${git_org}/${project_name}..."
+        if gh repo create "${git_org}/${project_name}" --private --source=. --push 2>/dev/null; then
+            echo -e "  ${GREEN}+${NC} GitHub repo created and pushed"
+        else
+            echo -e "  ${YELLOW}!${NC} GitHub repo creation failed (may already exist or no auth)"
+        fi
+    fi
+
+    # 9. Initialize sprint tracking
+    mkdir -p "$SPRINTS_DIR/$project_name"
+    jq --arg project "$project_name" --arg date "$(date +%Y-%m-%d)" \
+        '.project = $project | .startDate = $date' \
+        "$TEMPLATES_DIR/sprint.json" > "$SPRINTS_DIR/$project_name/sprint-1.json"
+    echo -e "  ${GREEN}+${NC} Sprint 1 initialized"
+
+    # 10. Re-scan to add to projects.json
+    echo ""
+    cmd_scan
+
+    echo ""
+    echo -e "${GREEN}Project $project_name created successfully!${NC}"
+    echo ""
+    echo -e "${BOLD}Next steps:${NC}"
+    echo "  1. Edit sprints/$project_name/sprint-1.json to define tasks"
+    echo "  2. hq dispatch $project_name"
+    echo "  3. hq status"
+}
+
+# --- ARCHIVE / ACTIVATE ---
+cmd_archive() {
+    local project="${1:?Usage: hq archive <project>}"
+    toggle_active "$project" false "archived"
+}
+
+cmd_activate() {
+    local project="${1:?Usage: hq activate <project>}"
+    toggle_active "$project" true "activated"
+}
+
+toggle_active() {
+    local project="$1"
+    local active_val="$2"
+    local action_label="$3"
+
+    if [[ ! -f "$PROJECTS_FILE" ]]; then
+        echo -e "${RED}Error:${NC} projects.json not found. Run 'hq scan' first."
+        exit 1
+    fi
+
+    local exists
+    exists=$(jq -r --arg name "$project" '.[] | select(.name == $name) | .name' "$PROJECTS_FILE" 2>/dev/null || true)
+
+    if [[ -z "$exists" ]]; then
+        echo -e "${RED}Error:${NC} Project '$project' not found in projects.json"
+        exit 1
+    fi
+
+    jq --arg name "$project" --argjson active "$active_val" \
+        '(.[] | select(.name == $name) | .active) = $active' \
+        "$PROJECTS_FILE" > "${PROJECTS_FILE}.tmp" && mv "${PROJECTS_FILE}.tmp" "$PROJECTS_FILE"
+
+    echo -e "${GREEN}Project '$project' ${action_label}.${NC}"
+}
+
+# --- CONFIG ---
+cmd_config() {
+    local project="${1:-}"
+
+    if [[ ! -f "$PROJECTS_FILE" ]]; then
+        echo -e "${RED}Error:${NC} projects.json not found. Run 'hq scan' first."
+        exit 1
+    fi
+
+    if [[ -z "$project" ]]; then
+        # Show all config
+        echo -e "\n${BOLD}ClaudeHQ Configuration${NC}\n"
+        echo -e "${GRAY}Projects root:${NC}  $PROJECTS_ROOT"
+        echo -e "${GRAY}HQ directory:${NC}   $HQ_DIR"
+        echo -e "${GRAY}Projects file:${NC}  $PROJECTS_FILE"
+        echo ""
+        echo -e "${BOLD}Projects:${NC}"
+        jq -r '.[] | "  \(.name)\t\(if .active then "active" else "archived" end)\t\(.jira // "-")\t\(.git // "-")"' "$PROJECTS_FILE" | column -t -s $'\t'
+    else
+        # Show specific project config
+        local info
+        info=$(jq --arg name "$project" '.[] | select(.name == $name)' "$PROJECTS_FILE")
+
+        if [[ -z "$info" ]]; then
+            echo -e "${RED}Error:${NC} Project '$project' not found."
+            exit 1
+        fi
+
+        echo -e "\n${BOLD}$project${NC}\n"
+        echo "$info" | jq '.'
+
+        # Show sprint info if exists
+        local sprint_dir="$SPRINTS_DIR/$project"
+        if [[ -d "$sprint_dir" ]]; then
+            local sprint_count
+            sprint_count=$(ls "$sprint_dir"/sprint-*.json 2>/dev/null | wc -l)
+            echo -e "\n${GRAY}Sprints:${NC} $sprint_count"
+        fi
+
+        # Show progress if exists
+        local progress_file="$PROGRESS_DIR/$project.json"
+        if [[ -f "$progress_file" ]]; then
+            echo -e "\n${GRAY}Last progress:${NC}"
+            jq '.' "$progress_file"
+        fi
+    fi
+    echo ""
+}
+
+# --- LOGS ---
+cmd_logs() {
+    local project="${1:?Usage: hq logs <project>}"
+    local log_file="$PROGRESS_DIR/${project}.log"
+
+    if [[ ! -f "$log_file" ]]; then
+        echo -e "${YELLOW}No logs found for $project.${NC}"
+        echo "Logs are created when you dispatch a project."
+        exit 0
+    fi
+
+    echo -e "${BOLD}Logs for $project${NC}\n"
+    cat "$log_file"
+}
+
+# --- MAIN ---
+case "${1:-}" in
+    scan)       shift; cmd_scan "$@" ;;
+    new)        shift; cmd_new "$@" ;;
+    dispatch)   shift; cmd_dispatch "$@" ;;
+    status)     shift; cmd_status "$@" ;;
+    sprint)     shift; cmd_sprint "$@" ;;
+    monitor)    shift; cmd_monitor "$@" ;;
+    stuck)      shift; cmd_stuck "$@" ;;
+    archive)    shift; cmd_archive "$@" ;;
+    activate)   shift; cmd_activate "$@" ;;
+    config)     shift; cmd_config "$@" ;;
+    logs)       shift; cmd_logs "$@" ;;
+    --help|-h)  usage ;;
+    *)          usage ;;
+esac
