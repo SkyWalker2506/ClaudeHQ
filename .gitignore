@@ -1,5 +1,27 @@
 projects.json
 progress/
 .claude/
+
+# Claude Code
+.claude/settings.local.json
+.jira-state/
+.agent_locks/
+.agent_progress.json
+.worktrees/
+.claude/worktrees/
+
+# Environment
 *.env
+
+# OS
 .DS_Store
+*.swp
+
+# IDE
+.idea/
+.vscode/
+.cursor/
+
+# Runtime
+*.log
+*.pid
