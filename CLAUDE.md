@@ -53,12 +53,7 @@ ClaudeHQ, tum projeleri merkezi olarak yonetir. `~/Projects` altinda CLAUDE.md o
 
 ### Tipik Workflow
 
-1. `hq scan` — Projeleri kesfet (veya `hq new <isim>` ile yeni proje ac)
-2. `hq sprint init <proje>` — Sprint dosyasi olustur, task'lari tanimla
-3. `hq dispatch <proje|--all>` — Claude session'larini baslat
-4. `hq monitor --watch` — Ilerlemeyi izle
-5. `hq stuck` — Takilan projeleri kontrol et
-6. `hq logs <proje>` — Detayli log incele
+Once projeleri kesfet veya yeni proje olustur, ardindan sprint baslat ve task'lari tanimla. Dispatch ile Claude session'larini calistir, monitor ile izle, takilan varsa mudahale et. Tum komutlar yukaridaki "Komutlar" bolumunde listelenmistir.
 
 ## Yeni proje kurma
 
