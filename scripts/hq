@@ -41,6 +41,7 @@ ${BOLD}Commands:${NC}
   config [project]            Show/edit project configuration
   logs <project>              Show session logs for a project
   sync [--dry-run]            Sync ecosystem stats to all downstream README pages
+  bootstrap [--all]           Full ecosystem setup on a new machine
 
 ${BOLD}Options:${NC}
   --dry-run                   Show what would happen without executing
@@ -872,6 +873,165 @@ cmd_config() {
     echo ""
 }
 
+# --- BOOTSTRAP ---
+cmd_bootstrap() {
+    local clone_all=0
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --all) clone_all=1; shift ;;
+            --help|-h)
+                cat <<BEOF
+${BOLD}hq bootstrap${NC} — Full ecosystem setup on a new machine
+
+${BOLD}Usage:${NC} hq bootstrap [--all]
+
+${BOLD}Steps:${NC}
+  1. Ensure gh auth is active
+  2. Clone & install claude-config (agents, skills, hooks, MCP)
+  3. Clone claude-secrets (private)
+  4. Run install.sh (symlinks, shell config, secrets)
+  5. Clone all project repos from projects.json (with --all)
+  6. Run hq scan to regenerate projects.json
+
+${BOLD}Options:${NC}
+  --all    Clone ALL project repos (not just core infra)
+BEOF
+                return 0 ;;
+            *) echo -e "${RED}Unknown option: $1${NC}"; return 1 ;;
+        esac
+    done
+
+    echo -e "${BOLD}🚀 ClaudeHQ Bootstrap — Full Ecosystem Setup${NC}\n"
+
+    # Step 0: Check prerequisites
+    echo -e "${BLUE}[0/6]${NC} Checking prerequisites..."
+    for cmd in git gh jq; do
+        if ! command -v "$cmd" &>/dev/null; then
+            echo -e "${RED}Missing:${NC} $cmd — install it first."
+            exit 1
+        fi
+    done
+
+    if ! gh auth status &>/dev/null; then
+        echo -e "${YELLOW}GitHub CLI not authenticated. Running gh auth login...${NC}"
+        gh auth login
+    fi
+    echo -e "${GREEN}✓${NC} Prerequisites OK\n"
+
+    # Step 1: Clone claude-config
+    echo -e "${BLUE}[1/6]${NC} claude-config..."
+    local config_dir="$PROJECTS_ROOT/claude-config"
+    if [[ -d "$config_dir/.git" ]]; then
+        echo -e "  ${GREEN}✓${NC} Already exists — pulling latest"
+        git -C "$config_dir" pull --quiet 2>/dev/null || true
+    else
+        echo -e "  Cloning..."
+        gh repo clone SkyWalker2506/claude-config "$config_dir" -- --quiet
+        echo -e "  ${GREEN}✓${NC} Cloned"
+    fi
+
+    # Step 2: Clone claude-secrets (private)
+    echo -e "${BLUE}[2/6]${NC} claude-secrets..."
+    local secrets_dir="$config_dir/claude-secrets"
+    if [[ -d "$secrets_dir/.git" ]]; then
+        echo -e "  ${GREEN}✓${NC} Already exists — pulling latest"
+        git -C "$secrets_dir" pull --quiet 2>/dev/null || true
+    else
+        echo -e "  Cloning (private)..."
+        if gh repo clone SkyWalker2506/claude-secrets "$secrets_dir" -- --quiet 2>/dev/null; then
+            echo -e "  ${GREEN}✓${NC} Cloned"
+        else
+            echo -e "  ${YELLOW}⚠${NC}  Clone failed — run manually: gh repo clone SkyWalker2506/claude-secrets $secrets_dir"
+        fi
+    fi
+
+    # Step 3: Run install.sh
+    echo -e "${BLUE}[3/6]${NC} Running install.sh..."
+    if [[ -f "$config_dir/install.sh" ]]; then
+        bash "$config_dir/install.sh" --auto
+        echo -e "  ${GREEN}✓${NC} install.sh completed"
+    else
+        echo -e "  ${RED}✗${NC} install.sh not found!"
+        exit 1
+    fi
+
+    # Step 4: Clone core Claude ecosystem repos
+    echo -e "${BLUE}[4/6]${NC} Core ecosystem repos..."
+    local core_repos=(
+        "SkyWalker2506/claude-marketplace:claude-marketplace"
+        "SkyWalker2506/claude-agent-catalog:claude-agent-catalog"
+    )
+    for entry in "${core_repos[@]}"; do
+        local repo="${entry%%:*}"
+        local dir_name="${entry##*:}"
+        local target="$PROJECTS_ROOT/$dir_name"
+        if [[ -d "$target/.git" ]]; then
+            echo -e "  ${GREEN}✓${NC} $dir_name (exists)"
+            git -C "$target" pull --quiet 2>/dev/null || true
+        else
+            if gh repo clone "$repo" "$target" -- --quiet 2>/dev/null; then
+                echo -e "  ${GREEN}✓${NC} $dir_name"
+            else
+                echo -e "  ${YELLOW}⚠${NC}  $dir_name — clone failed"
+            fi
+        fi
+    done
+
+    # Step 5: Clone all project repos (if --all)
+    if [[ "$clone_all" -eq 1 ]]; then
+        echo -e "${BLUE}[5/6]${NC} Cloning all project repos..."
+
+        # Use committed bootstrap list or fall back to projects.json
+        local repo_source="$HQ_DIR/projects.json"
+        if [[ ! -f "$repo_source" ]]; then
+            echo -e "  ${YELLOW}⚠${NC}  projects.json not found — skipping project repos"
+            echo "  Run 'hq scan' after manually cloning projects"
+        else
+            local total
+            total=$(jq '.projects | length' "$repo_source")
+            local cloned=0
+            for i in $(seq 0 $((total - 1))); do
+                local name git_remote
+                name=$(jq -r ".projects[$i].name" "$repo_source")
+                git_remote=$(jq -r ".projects[$i].git // empty" "$repo_source")
+
+                [[ -z "$git_remote" ]] && continue
+                # Skip already handled repos
+                [[ "$name" == "claude-config" || "$name" == "ClaudeHQ" ]] && continue
+
+                local target="$PROJECTS_ROOT/$name"
+                if [[ -d "$target/.git" ]]; then
+                    echo -e "  ${GREEN}✓${NC} $name (exists)"
+                    git -C "$target" pull --quiet 2>/dev/null || true
+                else
+                    if gh repo clone "$git_remote" "$target" -- --quiet 2>/dev/null; then
+                        echo -e "  ${GREEN}✓${NC} $name"
+                        ((cloned++))
+                    else
+                        echo -e "  ${YELLOW}⚠${NC}  $name — clone failed"
+                    fi
+                fi
+            done
+            echo -e "  Cloned $cloned new repos"
+        fi
+    else
+        echo -e "${BLUE}[5/6]${NC} Project repos — skipped (use --all to clone)"
+    fi
+
+    # Step 6: Scan & finalize
+    echo -e "${BLUE}[6/6]${NC} Running hq scan..."
+    cmd_scan
+
+    echo ""
+    echo -e "${GREEN}${BOLD}✅ Bootstrap complete!${NC}"
+    echo ""
+    echo -e "Next steps:"
+    echo -e "  cd ~/Projects/ClaudeHQ"
+    echo -e "  claude                    # Start Claude Code"
+    echo -e "  hq status                 # See all projects"
+    echo -e "  hq dispatch <project>     # Start working"
+}
+
 # --- LOGS ---
 cmd_logs() {
     local project="${1:?Usage: hq logs <project>}"
@@ -901,6 +1061,7 @@ case "${1:-}" in
     config)     shift; cmd_config "$@" ;;
     logs)       shift; cmd_logs "$@" ;;
     sync)       shift; exec "$HQ_DIR/scripts/sync-ecosystem.sh" "$@" ;;
+    bootstrap)  shift; cmd_bootstrap "$@" ;;
     --help|-h)  usage ;;
     *)          usage ;;
 esac

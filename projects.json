@@ -1,0 +1,22 @@
+{
+  "workspace": "~/Projects",
+  "projects": [
+    {"name": "ar-research", "path": "~/Projects/ar-research", "jira": "AR", "git": "SkyWalker2506/ar-research"},
+    {"name": "ByteCraftHQ", "path": "~/Projects/ByteCraftHQ", "jira": "BYT", "git": "SkyWalker2506/bytecraft-hq"},
+    {"name": "Viralyze", "path": "~/Projects/Viralyze", "jira": "VIR", "git": "SkyWalker2506/Viralyze"},
+    {"name": "VocabLearningApp", "path": "~/Projects/VocabLearningApp", "jira": "VOC", "git": "SkyWalker2506/vocab-learning-app"},
+    {"name": "football-ai-platform", "path": "~/Projects/football-ai-platform", "jira": null, "git": "BlackMountainsStudio/tartismalipozisyonlar"},
+    {"name": "KnightOnlineAI", "path": "~/Projects/KnightOnlineAI", "jira": "KOAI", "git": "SkyWalker2506/KnightOnlineAI"},
+    {"name": "ProjeBirlik", "path": "~/Projects/ProjeBirlik", "jira": "PROJ", "git": "SkyWalker2506/projebirlik"},
+    {"name": "trading-bot", "path": "~/Projects/trading-bot", "jira": "TB", "git": "SkyWalker2506/trading-bot"},
+    {"name": "transcriptr", "path": "~/Projects/transcriptr", "jira": "TSCR", "git": "SkyWalker2506/transcriptr"},
+    {"name": "claude-config", "path": "~/Projects/claude-config", "jira": "CC", "git": "SkyWalker2506/claude-config"},
+    {"name": "claude-marketplace", "path": "~/Projects/claude-marketplace", "jira": null, "git": "SkyWalker2506/claude-marketplace"},
+    {"name": "CoinHQ", "path": "~/Projects/CoinHQ", "jira": "COIN", "git": "SkyWalker2506/CoinHQ"},
+    {"name": "ClaudeHQ", "path": "~/Projects/ClaudeHQ", "jira": "CHQ", "git": "SkyWalker2506/ClaudeHQ"},
+    {"name": "Gardirop", "path": "~/Projects/Gardirop", "jira": "GARD", "git": "SkyWalker2506/gardirop"},
+    {"name": "RefinUp", "path": "~/Projects/RefinUp", "jira": null, "git": "SkyWalker2506/RefinUp"},
+    {"name": "ArtLift", "path": "~/Projects/ArtLift", "jira": "ART", "git": "SkyWalker2506/ArtLift"},
+    {"name": "ccplugin-backend-forge", "path": "~/Projects/ccplugin-backend-forge", "jira": "CHQ", "git": "SkyWalker2506/ccplugin-backend-forge"}
+  ]
+}

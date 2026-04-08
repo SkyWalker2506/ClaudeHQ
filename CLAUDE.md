@@ -29,6 +29,7 @@ ClaudeHQ, tum projeleri merkezi olarak yonetir. `~/Projects` altinda CLAUDE.md o
 
 ### Komutlar
 
+- `./scripts/hq bootstrap [--all]` — Yeni PC'de tum ekosistemi kur (config, secrets, repos, install)
 - `./scripts/hq scan` — ~/Projects tara, projects.json olustur/guncelle
 - `./scripts/hq new <isim> [--jira KEY]` — Yeni proje olustur (git, CLAUDE.md, sprint dahil)
 - `./scripts/hq dispatch <proje>` — Tek proje icin Claude session baslat
