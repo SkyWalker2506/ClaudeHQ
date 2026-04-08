@@ -17,6 +17,8 @@
     {"name": "Gardirop", "path": "~/Projects/Gardirop", "jira": "GARD", "git": "SkyWalker2506/gardirop"},
     {"name": "RefinUp", "path": "~/Projects/RefinUp", "jira": null, "git": "SkyWalker2506/RefinUp"},
     {"name": "ArtLift", "path": "~/Projects/ArtLift", "jira": "ART", "git": "SkyWalker2506/ArtLift"},
-    {"name": "ccplugin-backend-forge", "path": "~/Projects/ccplugin-backend-forge", "jira": "CHQ", "git": "SkyWalker2506/ccplugin-backend-forge"}
+    {"name": "ccplugin-backend-forge", "path": "~/Projects/ccplugin-backend-forge", "jira": "CHQ", "git": "SkyWalker2506/ccplugin-backend-forge"},
+    {"name": "craft-unity", "path": "~/Projects/craft-unity", "jira": "CHQ", "git": "SkyWalker2506/craft-unity"},
+    {"name": "ccplugin-unity-craft", "path": "~/Projects/ccplugin-unity-craft", "jira": "CHQ", "git": "SkyWalker2506/ccplugin-unity-craft"}
   ]
 }
