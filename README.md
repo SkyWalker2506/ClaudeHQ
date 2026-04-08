@@ -23,7 +23,7 @@ That's it. `install.sh` sets up CLAUDE.md redirectors, MCP servers, skills, and 
 | Repository | Description | Link |
 |-----------|-------------|------|
 | **claude-config** | Rules, skills, agent definitions, plugin registry. Installed into every project. | [repo](https://github.com/SkyWalker2506/claude-config) |
-| **claude-marketplace** | Plugin marketplace — 20 plugins and growing | [repo](https://github.com/SkyWalker2506/claude-marketplace) |
+| **claude-marketplace** | Plugin marketplace — 21 plugins and growing | [repo](https://github.com/SkyWalker2506/claude-marketplace) |
 | **claude-agent-catalog** | Agent catalog — 139 agents across 15 categories | [repo](https://github.com/SkyWalker2506/claude-agent-catalog) |
 | **ccplugin-*** | Individual plugin repos (notifications, jira, firebase, etc.) | [search](https://github.com/SkyWalker2506?tab=repositories&q=ccplugin) |
 
@@ -168,7 +168,7 @@ ClaudeHQ (you are here)
 | Repo | Description |
 |------|-------------|
 | [claude-config](https://github.com/SkyWalker2506/claude-config) | Multi-Agent OS — 139 agents, local-first routing, cost-aware orchestration |
-| [claude-marketplace](https://github.com/SkyWalker2506/claude-marketplace) | Claude Code Plugin Marketplace — 20 plugins, one-command install |
+| [claude-marketplace](https://github.com/SkyWalker2506/claude-marketplace) | Claude Code Plugin Marketplace — 21 plugins, one-command install |
 | [claude-agent-catalog](https://github.com/SkyWalker2506/claude-agent-catalog) | Agent catalog — 139 agents across 15 categories |
 | [sdk-market](https://github.com/SkyWalker2506/sdk-market) | SDK Market — production-ready kits for Flutter and beyond |
 

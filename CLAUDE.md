@@ -63,8 +63,8 @@ Agent, plugin veya skill eklendiginde/silindiginde/degistiginde **tum downstream
 
 | Degisiklik | Guncellenen sayfalar |
 |------------|---------------------|
-| Agent eklendi/silindi (`claude-config/agents/`) | `claude-agent-catalog/README.md`, `ClaudeHQ/README.md` |
-| Plugin eklendi/silindi (`ccplugin-*`) | `claude-marketplace/README.md`, `marketplace.json`, `ClaudeHQ/README.md` |
+| Agent eklendi/silindi (`claude-config/agents/`) | `claude-config/README.md`, `claude-agent-catalog/README.md`, `ClaudeHQ/README.md` |
+| Plugin eklendi/silindi (`ccplugin-*`) | `claude-config/README.md`, `claude-marketplace/README.md`, `marketplace.json`, `ClaudeHQ/README.md` |
 | Plugin marketplace.json'a eklendi | `claude-marketplace/README.md` (tablo), `marketplace.json` (description) |
 | Skill eklendi/silindi (`claude-config/global/skills/`) | (sayilar henuz README'lerde yok, eklenirse guncelle) |
 | Proje eklendi/silindi | `ClaudeHQ/README.md` (projects tablosu), `projects.json` (`hq scan`) |

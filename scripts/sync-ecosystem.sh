@@ -95,6 +95,37 @@ replace_in "$R" \
   "Plugin Marketplace — $plugin_repo_count plugins" \
   "marketplace count (bottom)"
 
+# ─── claude-config/README.md ─────────────────────────────────────────
+R="$PROJECTS_ROOT/claude-config/README.md"
+replace_in "$R" \
+  "Multi-Agent OS for Claude Code.* — [0-9]+ agents, [0-9]+ plugins" \
+  "Multi-Agent OS for Claude Code** — $agent_count agents, $plugin_repo_count plugins" \
+  "header line"
+replace_in "$R" \
+  '\*\*[0-9]+ AI agents\*\* across [0-9]+ categories' \
+  "**${agent_count} AI agents** across ${category_count} categories" \
+  "agent count"
+replace_in "$R" \
+  '\*\*[0-9]+ plugins\*\* published' \
+  "**${plugin_repo_count} plugins** published" \
+  "plugin count"
+replace_in "$R" \
+  "[0-9]+ plugins, each in its own repo" \
+  "${plugin_repo_count} plugins, each in its own repo" \
+  "plugins section"
+replace_in "$R" \
+  "[0-9]+ agents across [0-9]+ categories\. Each agent" \
+  "${agent_count} agents across ${category_count} categories. Each agent" \
+  "agents section"
+replace_in "$R" \
+  "Plugin Marketplace.* — [0-9]+ plugins" \
+  "Plugin Marketplace](https://github.com/SkyWalker2506/claude-marketplace) — $plugin_repo_count plugins" \
+  "related links plugins"
+replace_in "$R" \
+  "Agent Catalog.* — [0-9]+ agents across [0-9]+ categories" \
+  "Agent Catalog](https://github.com/SkyWalker2506/claude-agent-catalog) — $agent_count agents across $category_count categories" \
+  "related links agents"
+
 # ─── claude-marketplace/README.md ────────────────────────────────────
 R="$PROJECTS_ROOT/claude-marketplace/README.md"
 replace_in "$R" \
