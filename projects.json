@@ -18,6 +18,9 @@
     {"name": "RefinUp", "path": "~/Projects/RefinUp", "jira": null, "git": "SkyWalker2506/RefinUp"},
     {"name": "ArtLift", "path": "~/Projects/ArtLift", "jira": "ART", "git": "SkyWalker2506/ArtLift"},
     {"name": "ccplugin-backend-forge", "path": "~/Projects/ccplugin-backend-forge", "jira": "CHQ", "git": "SkyWalker2506/ccplugin-backend-forge"},
+    {"name": "LudoMultiplayer", "path": "~/Projects/LudoMultiplayer", "jira": null, "git": "SkyWalker2506/ludo-multiplayer"},
+    {"name": "claude-design-system", "path": "~/Projects/claude-design-system", "jira": "CDS", "git": "SkyWalker2506/claude-design-system"},
+    {"name": "ccplugin-3d-forge", "path": "~/Projects/ccplugin-3d-forge", "jira": "TDF", "git": "SkyWalker2506/ccplugin-3d-forge"},
     {"name": "craft-unity", "path": "~/Projects/craft-unity", "jira": "CHQ", "git": "SkyWalker2506/craft-unity"},
     {"name": "ccplugin-unity-craft", "path": "~/Projects/ccplugin-unity-craft", "jira": "CHQ", "git": "SkyWalker2506/ccplugin-unity-craft"}
   ]
