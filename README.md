@@ -23,8 +23,8 @@ That's it. `install.sh` sets up CLAUDE.md redirectors, MCP servers, skills, and 
 | Repository | Description | Link |
 |-----------|-------------|------|
 | **claude-config** | Rules, skills, agent definitions, plugin registry. Installed into every project. | [repo](https://github.com/SkyWalker2506/claude-config) |
-| **claude-marketplace** | Plugin marketplace — 18 plugins and growing | [repo](https://github.com/SkyWalker2506/claude-marketplace) |
-| **claude-agent-catalog** | Agent catalog — 134 agents across 15 categories | [repo](https://github.com/SkyWalker2506/claude-agent-catalog) |
+| **claude-marketplace** | Plugin marketplace — 20 plugins and growing | [repo](https://github.com/SkyWalker2506/claude-marketplace) |
+| **claude-agent-catalog** | Agent catalog — 139 agents across 15 categories | [repo](https://github.com/SkyWalker2506/claude-agent-catalog) |
 | **ccplugin-*** | Individual plugin repos (notifications, jira, firebase, etc.) | [search](https://github.com/SkyWalker2506?tab=repositories&q=ccplugin) |
 
 ---
@@ -133,6 +133,7 @@ ClaudeHQ includes a CLI tool (`scripts/hq`) for managing sprints, dispatching Cl
 | `hq activate <project>` | Reactivate a project |
 | `hq config [project]` | Show project configuration |
 | `hq logs <project>` | Show session logs |
+| `hq sync [--dry-run]` | Sync ecosystem stats to all downstream README pages |
 
 ### How It Works
 
@@ -166,9 +167,9 @@ ClaudeHQ (you are here)
 
 | Repo | Description |
 |------|-------------|
-| [claude-config](https://github.com/SkyWalker2506/claude-config) | Multi-Agent OS — 134 agents, local-first routing, cost-aware orchestration |
-| [claude-marketplace](https://github.com/SkyWalker2506/claude-marketplace) | Claude Code Plugin Marketplace — 18 plugins, one-command install |
-| [claude-agent-catalog](https://github.com/SkyWalker2506/claude-agent-catalog) | Agent catalog — 134 agents across 15 categories |
+| [claude-config](https://github.com/SkyWalker2506/claude-config) | Multi-Agent OS — 139 agents, local-first routing, cost-aware orchestration |
+| [claude-marketplace](https://github.com/SkyWalker2506/claude-marketplace) | Claude Code Plugin Marketplace — 20 plugins, one-command install |
+| [claude-agent-catalog](https://github.com/SkyWalker2506/claude-agent-catalog) | Agent catalog — 139 agents across 15 categories |
 | [sdk-market](https://github.com/SkyWalker2506/sdk-market) | SDK Market — production-ready kits for Flutter and beyond |
 
 ---

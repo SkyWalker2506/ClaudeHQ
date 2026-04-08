@@ -40,6 +40,7 @@ ${BOLD}Commands:${NC}
   activate <project>          Mark project as active
   config [project]            Show/edit project configuration
   logs <project>              Show session logs for a project
+  sync [--dry-run]            Sync ecosystem stats to all downstream README pages
 
 ${BOLD}Options:${NC}
   --dry-run                   Show what would happen without executing
@@ -899,6 +900,7 @@ case "${1:-}" in
     activate)   shift; cmd_activate "$@" ;;
     config)     shift; cmd_config "$@" ;;
     logs)       shift; cmd_logs "$@" ;;
+    sync)       shift; exec "$HQ_DIR/scripts/sync-ecosystem.sh" "$@" ;;
     --help|-h)  usage ;;
     *)          usage ;;
 esac

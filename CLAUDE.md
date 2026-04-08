@@ -55,6 +55,36 @@ ClaudeHQ, tum projeleri merkezi olarak yonetir. `~/Projects` altinda CLAUDE.md o
 
 Once projeleri kesfet veya yeni proje olustur, ardindan sprint baslat ve task'lari tanimla. Dispatch ile Claude session'larini calistir, monitor ile izle, takilan varsa mudahale et. Tum komutlar yukaridaki "Komutlar" bolumunde listelenmistir.
 
+## Ecosystem Sync (genel kural)
+
+Agent, plugin veya skill eklendiginde/silindiginde/degistiginde **tum downstream sayfalari guncelle**. Bu kural her zaman gecerlidir — hangi projede calisirsan calis.
+
+### Downstream haritasi
+
+| Degisiklik | Guncellenen sayfalar |
+|------------|---------------------|
+| Agent eklendi/silindi (`claude-config/agents/`) | `claude-agent-catalog/README.md`, `ClaudeHQ/README.md` |
+| Plugin eklendi/silindi (`ccplugin-*`) | `claude-marketplace/README.md`, `marketplace.json`, `ClaudeHQ/README.md` |
+| Plugin marketplace.json'a eklendi | `claude-marketplace/README.md` (tablo), `marketplace.json` (description) |
+| Skill eklendi/silindi (`claude-config/global/skills/`) | (sayilar henuz README'lerde yok, eklenirse guncelle) |
+| Proje eklendi/silindi | `ClaudeHQ/README.md` (projects tablosu), `projects.json` (`hq scan`) |
+
+### Nasil calistirilir
+
+```bash
+# Sayilari say, tum README'leri guncelle
+./scripts/hq sync
+
+# Nelerin degisecegini goster (dosya degistirmez)
+./scripts/hq sync --dry-run
+```
+
+### Kural
+
+1. Agent/plugin/skill degisikligi yapildiginda `hq sync` calistir
+2. Guncellenen dosyalari ilgili repo'larinda commit et
+3. README'lerdeki sayilari asla elle yazma — her zaman `hq sync` kullan
+
 ## Yeni proje kurma
 
 1. `mkdir ~/Projects/<proje-adi>`
