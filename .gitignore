@@ -9,6 +9,9 @@ progress/
 .worktrees/
 .claude/worktrees/
 
+# Reference repos (3rd party — do not push)
+references/
+
 # Environment
 *.env
 
