@@ -2,7 +2,7 @@
 
 **Central hub for the Claude Code ecosystem — by Musab Kara**
 
-ClaudeHQ is the entry point to my Claude-powered development ecosystem. It connects all configuration, plugins, agents, and projects under one roof. Open this repo in Claude Code to manage your entire workspace from a single session.
+ClaudeHQ is the workspace hub for my Claude-powered development ecosystem. On GitHub, start the tour at the **[agent catalog](https://github.com/SkyWalker2506/claude-agent-catalog)**, then **[marketplace](https://github.com/SkyWalker2506/claude-marketplace)**, then **[claude-config](https://github.com/SkyWalker2506/claude-config)** — this repo is step **4** (open Claude Code here to drive all projects). Open this repo in Claude Code to manage your entire workspace from a single session.
 
 ---
 
@@ -18,14 +18,15 @@ That's it. `install.sh` sets up CLAUDE.md redirectors, MCP servers, skills, and 
 
 ---
 
-## Ecosystem
+## Ecosystem (GitHub order)
 
-| Repository | Description | Link |
-|-----------|-------------|------|
-| **claude-config** | Rules, skills, agent definitions, plugin registry. Installed into every project. | [repo](https://github.com/SkyWalker2506/claude-config) |
-| **claude-marketplace** | Plugin marketplace — 21 plugins and growing | [repo](https://github.com/SkyWalker2506/claude-marketplace) |
-| **claude-agent-catalog** | Agent catalog — 139 agents across 15 categories | [repo](https://github.com/SkyWalker2506/claude-agent-catalog) |
-| **ccplugin-*** | Individual plugin repos (notifications, jira, firebase, etc.) | [search](https://github.com/SkyWalker2506?tab=repositories&q=ccplugin) |
+| Step | Repository | Description | Link |
+|------|------------|-------------|------|
+| **1** | **claude-agent-catalog** | Agent inventory — start here on GitHub | [repo](https://github.com/SkyWalker2506/claude-agent-catalog) |
+| **2** | **claude-marketplace** | Plugin marketplace — browse & install | [repo](https://github.com/SkyWalker2506/claude-marketplace) |
+| **3** | **claude-config** | Multi-Agent OS — rules, skills, agents, MCP, `install.sh` | [repo](https://github.com/SkyWalker2506/claude-config) |
+| **4** | **ClaudeHQ** | This repo — cross-project workspace | [repo](https://github.com/SkyWalker2506/ClaudeHQ) |
+| — | **ccplugin-*** | Individual plugin repos | [search](https://github.com/SkyWalker2506?tab=repositories&q=ccplugin) |
 
 ---
 
