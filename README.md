@@ -1,8 +1,30 @@
+<div align="center">
+
 # ClaudeHQ
 
-**Central hub for the Claude Code ecosystem — by Musab Kara**
+### **Workspace hub** for the [**Claude Code**](https://claude.ai/claude-code) ecosystem
 
-ClaudeHQ is the workspace hub for my Claude-powered development ecosystem. On GitHub, start the tour at the **[agent catalog](https://github.com/SkyWalker2506/claude-agent-catalog)**, then **[marketplace](https://github.com/SkyWalker2506/claude-marketplace)**, then **[claude-config](https://github.com/SkyWalker2506/claude-config)** — this repo is step **4** (open Claude Code here to drive all projects). Open this repo in Claude Code to manage your entire workspace from a single session.
+[![Ecosystem](https://img.shields.io/badge/step-4_of_4-8b5cf6)](https://github.com/SkyWalker2506/ClaudeHQ#ecosystem-github-order)
+[![claude-config](https://img.shields.io/badge/claude--config-Multi--Agent_OS-6366f1?logo=github)](https://github.com/SkyWalker2506/claude-config)
+[![Author](https://img.shields.io/badge/Musab_Kara-LinkedIn-0A66C2?logo=linkedin)](https://linkedin.com/in/musab-kara-85580612a)
+
+**You are here — step 4 ·** Open this repo in Claude Code to orchestrate **all** projects under one session.
+
+[Quick start](#quick-start) · [Ecosystem](#ecosystem-github-order) · [HQ CLI](#project-management)
+
+</div>
+
+---
+
+On GitHub, start the tour at the **[agent catalog](https://github.com/SkyWalker2506/claude-agent-catalog)** → **[marketplace](https://github.com/SkyWalker2506/claude-marketplace)** → **[claude-config](https://github.com/SkyWalker2506/claude-config)** → **ClaudeHQ (this repo)**.
+
+```mermaid
+flowchart LR
+  A[1 Agent Catalog] --> B[2 Marketplace]
+  B --> C[3 claude-config]
+  C --> D[4 ClaudeHQ]
+  style D fill:#4c1d95,color:#fff
+```
 
 ---
 
