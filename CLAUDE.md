@@ -32,8 +32,9 @@ ClaudeHQ, tum projeleri merkezi olarak yonetir. `~/Projects` altinda CLAUDE.md o
 - `./scripts/hq bootstrap [--all]` — Yeni PC'de tum ekosistemi kur (config, secrets, repos, install)
 - `./scripts/hq scan` — ~/Projects tara, projects.json olustur/guncelle
 - `./scripts/hq new <isim> [--jira KEY]` — Yeni proje olustur (git, CLAUDE.md, sprint dahil)
-- `./scripts/hq dispatch <proje>` — Tek proje icin Claude session baslat
-- `./scripts/hq dispatch --all` — Tum aktif projeler icin toplu session baslat
+- `./scripts/hq session <proje>` — Tek proje icin Claude session baslat
+- `./scripts/hq session --all` — Tum aktif projeler icin toplu session baslat
+- `./scripts/hq dispatch <proje>` — (Deprecated) `session` icin alias; kullanmaktan kacinin
 - `./scripts/hq status [proje]` — Durum dashboard'u goster
 - `./scripts/hq sprint plan <proje>` — Sprint planlama session'i baslat
 - `./scripts/hq sprint list [proje]` — Sprint'leri listele

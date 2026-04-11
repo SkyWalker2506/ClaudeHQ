@@ -10,6 +10,7 @@ PROGRESS_DIR="$HQ_DIR/progress"
 SPRINTS_DIR="$HQ_DIR/sprints"
 PROJECTS_FILE="$HQ_DIR/projects.json"
 TEMPLATES_DIR="$HQ_DIR/templates"
+FEATURES_DIR="$HQ_DIR/features"
 
 # Colors
 RED='\033[0;31m'
@@ -27,21 +28,26 @@ ${BOLD}ClaudeHQ — Project Management CLI${NC}
 ${BOLD}Usage:${NC} hq <command> [options]
 
 ${BOLD}Commands:${NC}
-  scan                        Scan ~/Projects for CLAUDE.md projects
-  new <name> [--jira KEY]     Create a new project with full ecosystem setup
-  dispatch <project|--all>    Launch Claude session(s) for project(s)
-  status [project]            Show project status dashboard
-  sprint plan <project>       Launch sprint planning session
-  sprint list [project]       List sprints
-  sprint init <project>       Initialize sprint tracking for a project
-  monitor [--watch]           Watch running sessions
-  stuck                       Show stuck/blocked projects
-  archive <project>           Mark project as inactive
-  activate <project>          Mark project as active
-  config [project]            Show/edit project configuration
-  logs <project>              Show session logs for a project
-  sync [--dry-run]            Sync ecosystem stats to all downstream README pages
-  bootstrap [--all]           Full ecosystem setup on a new machine
+  scan                              Scan ~/Projects for CLAUDE.md projects
+  new <name> [--jira KEY]           Create a new project with full ecosystem setup
+  session <project|--all>           Launch Claude session(s) for project(s)
+  dispatch <project|--all>          Deprecated alias for session
+  status [project]                  Show project status dashboard
+  sprint plan <project>             Launch sprint planning session
+  sprint list [project]             List sprints
+  sprint init <project>             Initialize sprint tracking for a project
+  feature start <name> [--repos=..]  Start a cross-repo feature branch
+  feature status <name>             Show feature branch status across repos
+  feature commit <name> -m "msg"    Commit changes in all repos with changes
+  monitor [--watch]                 Watch running sessions
+  stuck                             Show stuck/blocked projects
+  archive <project>                 Mark project as inactive
+  activate <project>                Mark project as active
+  config [project]                  Show/edit project configuration
+  logs <project>                    Show session logs for a project
+  sync [--dry-run]                  Sync ecosystem stats to all downstream README pages
+  bootstrap [--all]                 Full ecosystem setup on a new machine
+  doctor                            Health check: symlinks, paths, git remotes, dep cycles
 
 ${BOLD}Options:${NC}
   --dry-run                   Show what would happen without executing
@@ -53,8 +59,8 @@ ${BOLD}Environment:${NC}
 ${BOLD}Examples:${NC}
   hq scan                     Discover all projects
   hq new my-app --jira MA     Create new project
-  hq dispatch VocabLearningApp
-  hq dispatch --all           Launch all active projects
+  hq session VocabLearningApp
+  hq session --all            Launch all active projects
   hq status                   Show dashboard
   hq monitor --watch          Live monitoring
   hq logs trading-bot         Show logs
@@ -71,6 +77,8 @@ cmd_scan() {
     fi
 
     echo -e "${BLUE}Scanning${NC} $PROJECTS_ROOT for CLAUDE.md projects..."
+
+    mkdir -p "$HQ_DIR/workspaces"
 
     local projects="[]"
     local count=0
@@ -131,6 +139,10 @@ cmd_scan() {
         projects=$(echo "$projects" | jq --argjson entry "$entry" '. + [$entry]')
         count=$((count + 1))
 
+        # Create workspace symlink for new project
+        local proj_path="$project_dir"
+        ln -sfn "$proj_path" "$HQ_DIR/workspaces/$(basename "$proj_path")"
+
         echo -e "  ${GREEN}+${NC} $project_name $([ -n "$jira_key" ] && echo "[${jira_key}]" || true) $([ -n "$git_remote" ] && echo "($git_remote)" || true)"
 
     done < <(find "$PROJECTS_ROOT" -maxdepth 2 -name "CLAUDE.md" -not -path "*/node_modules/*" 2>/dev/null | sort)
@@ -142,8 +154,8 @@ cmd_scan() {
     echo -e "${GREEN}Found $count project(s).${NC} Written to projects.json"
 }
 
-# --- DISPATCH ---
-cmd_dispatch() {
+# --- SESSION ---
+cmd_session() {
     local target="${1:-}"
     local dry_run=false
 
@@ -155,7 +167,7 @@ cmd_dispatch() {
     done
 
     if [[ -z "$target" ]]; then
-        echo -e "${RED}Usage:${NC} hq dispatch <project|--all> [--dry-run]"
+        echo -e "${RED}Usage:${NC} hq session <project|--all> [--dry-run]"
         exit 1
     fi
 
@@ -175,13 +187,19 @@ cmd_dispatch() {
             exit 0
         fi
 
-        echo -e "${BLUE}Dispatching all active projects...${NC}"
+        echo -e "${BLUE}Launching all active project sessions...${NC}"
         while IFS= read -r name; do
             dispatch_project "$name" "$dry_run"
         done <<< "$project_names"
     else
         dispatch_project "$target" "$dry_run"
     fi
+}
+
+# --- DISPATCH (deprecated alias for session) ---
+cmd_dispatch() {
+    echo "⚠️  'hq dispatch' is deprecated. Use 'hq session' instead." >&2
+    cmd_session "$@"
 }
 
 dispatch_project() {
@@ -784,7 +802,7 @@ README
     echo ""
     echo -e "${BOLD}Next steps:${NC}"
     echo "  1. Edit sprints/$project_name/sprint-1.json to define tasks"
-    echo "  2. hq dispatch $project_name"
+    echo "  2. hq session $project_name"
     echo "  3. hq status"
 }
 
@@ -1029,7 +1047,228 @@ BEOF
     echo -e "  cd ~/Projects/ClaudeHQ"
     echo -e "  claude                    # Start Claude Code"
     echo -e "  hq status                 # See all projects"
-    echo -e "  hq dispatch <project>     # Start working"
+    echo -e "  hq session <project>      # Start working"
+}
+
+# --- DOCTOR ---
+cmd_doctor() {
+    if [[ ! -f "$PROJECTS_FILE" ]]; then
+        echo -e "${RED}Error:${NC} projects.json not found. Run 'hq scan' first."
+        exit 1
+    fi
+
+    local workspaces_dir="$HQ_DIR/workspaces"
+
+    echo ""
+    echo -e "${BOLD}🏥 ClaudeHQ Doctor${NC}"
+    printf '══%.0s' {1..54}; echo ""
+
+    # Collect project names and paths via Python (v2 schema: .projects is an object)
+    local project_data
+    project_data=$(python3 - "$PROJECTS_FILE" <<'PYEOF'
+import json, sys
+
+with open(sys.argv[1]) as f:
+    data = json.load(f)
+
+if isinstance(data, dict) and "projects" in data:
+    projects = data["projects"]
+    for name, info in projects.items():
+        path = info.get("path", "")
+        print(f"{name}\t{path}")
+elif isinstance(data, list):
+    for item in data:
+        print("{}\t{}".format(item.get("name",""), item.get("path","")))
+PYEOF
+)
+
+    if [[ -z "$project_data" ]]; then
+        echo -e "${YELLOW}No projects found in projects.json.${NC}"
+        echo ""
+        return 0
+    fi
+
+    # Print header
+    printf "${BOLD}%-22s %-16s %-13s %-14s${NC}\n" \
+        "Project" "Symlink" "Path" "Git Remote"
+    printf '──%.0s' {1..67}; echo ""
+
+    local ok_count=0
+    local warn_count=0
+    local err_count=0
+
+    while IFS=$'\t' read -r name raw_path; do
+        [[ -z "$name" ]] && continue
+
+        # Expand ~/
+        local path="${raw_path/#\~/$HOME}"
+
+        # --- Symlink check ---
+        local symlink_status symlink_color
+        local symlink_path="$workspaces_dir/$name"
+        if [[ -L "$symlink_path" ]]; then
+            if [[ -e "$symlink_path" ]]; then
+                symlink_status="✅ OK"
+                symlink_color="$GREEN"
+                ok_count=$((ok_count + 1))
+            else
+                symlink_status="❌ BROKEN"
+                symlink_color="$RED"
+                err_count=$((err_count + 1))
+            fi
+        else
+            symlink_status="⚠️ MISSING"
+            symlink_color="$YELLOW"
+            warn_count=$((warn_count + 1))
+        fi
+
+        # --- Path check ---
+        local path_status path_color
+        if [[ -d "$path" ]]; then
+            path_status="✅ EXISTS"
+            path_color="$GREEN"
+            ok_count=$((ok_count + 1))
+        else
+            path_status="❌ MISSING"
+            path_color="$RED"
+            err_count=$((err_count + 1))
+        fi
+
+        # --- Git remote check ---
+        local git_status git_color
+        if [[ -d "$path" ]]; then
+            if [[ -d "$path/.git" ]]; then
+                local remote
+                remote=$(git -C "$path" remote get-url origin 2>/dev/null || true)
+                if [[ -n "$remote" ]]; then
+                    git_status="✅ HAS_REMOTE"
+                    git_color="$GREEN"
+                    ok_count=$((ok_count + 1))
+                else
+                    git_status="⚠️ NO_REMOTE"
+                    git_color="$YELLOW"
+                    warn_count=$((warn_count + 1))
+                fi
+            else
+                git_status="❌ NOT_GIT"
+                git_color="$RED"
+                err_count=$((err_count + 1))
+            fi
+        else
+            git_status="—"
+            git_color="$GRAY"
+        fi
+
+        printf "%-22s ${symlink_color}%-16s${NC} ${path_color}%-13s${NC} ${git_color}%-14s${NC}\n" \
+            "$name" "$symlink_status" "$path_status" "$git_status"
+
+    done <<< "$project_data"
+
+    printf '──%.0s' {1..67}; echo ""
+
+    # --- Dependency cycle check ---
+    local cycle_result
+    cycle_result=$(python3 - "$PROJECTS_FILE" <<'PYEOF'
+import json, sys
+
+with open(sys.argv[1]) as f:
+    data = json.load(f)
+
+if isinstance(data, dict) and "projects" in data:
+    graph = {name: info.get("depends_on", []) for name, info in data["projects"].items()}
+elif isinstance(data, list):
+    graph = {item["name"]: item.get("depends_on", []) for item in data}
+else:
+    print("ACYCLIC")
+    sys.exit(0)
+
+# DFS cycle detection
+WHITE, GRAY_STATE, BLACK = 0, 1, 2
+color = {n: WHITE for n in graph}
+cycle_path = []
+
+def dfs(node, path):
+    color[node] = GRAY_STATE
+    path.append(node)
+    for neighbor in graph.get(node, []):
+        if neighbor not in color:
+            continue
+        if color[neighbor] == GRAY_STATE:
+            cycle_path.extend(path)
+            cycle_path.append(neighbor)
+            return True
+        if color[neighbor] == WHITE:
+            if dfs(neighbor, path):
+                return True
+    path.pop()
+    color[node] = BLACK
+    return False
+
+for node in list(graph.keys()):
+    if color[node] == WHITE:
+        if dfs(node, []):
+            print("CYCLE: " + " -> ".join(cycle_path))
+            sys.exit(0)
+
+print("ACYCLIC")
+PYEOF
+)
+
+    if [[ "$cycle_result" == "ACYCLIC" ]]; then
+        printf "%-30s ${GREEN}✅ ACYCLIC${NC}\n" "Dependency graph:"
+        ok_count=$((ok_count + 1))
+    else
+        printf "%-30s ${RED}❌ CYCLE_DETECTED: %s${NC}\n" "Dependency graph:" "${cycle_result#CYCLE: }"
+        err_count=$((err_count + 1))
+    fi
+
+    # --- Orphan symlinks check ---
+    local orphan_found=false
+    if [[ -d "$workspaces_dir" ]]; then
+        local known_names
+        known_names=$(python3 - "$PROJECTS_FILE" <<'PYEOF'
+import json, sys
+with open(sys.argv[1]) as f:
+    data = json.load(f)
+if isinstance(data, dict) and "projects" in data:
+    for name in data["projects"]:
+        print(name)
+elif isinstance(data, list):
+    for item in data:
+        print(item.get("name",""))
+PYEOF
+)
+
+        while IFS= read -r symlink; do
+            local sym_name
+            sym_name=$(basename "$symlink")
+            if ! grep -qxF "$sym_name" <<< "$known_names" 2>/dev/null; then
+                printf "%-30s ${YELLOW}⚠️  ORPHAN: %s${NC}\n" "Orphan symlinks:" "$sym_name"
+                warn_count=$((warn_count + 1))
+                orphan_found=true
+            fi
+        done < <(find "$workspaces_dir" -maxdepth 1 -type l 2>/dev/null)
+    fi
+
+    if [[ "$orphan_found" == "false" ]]; then
+        printf "%-30s ${GREEN}✅ NONE${NC}\n" "Orphan symlinks:"
+        ok_count=$((ok_count + 1))
+    fi
+
+    printf '──%.0s' {1..67}; echo ""
+
+    # --- Summary ---
+    local summary="${GREEN}${ok_count} OK${NC}"
+    if (( warn_count > 0 )); then
+        local wlabel="warning"; (( warn_count > 1 )) && wlabel="warnings"
+        summary+=", ${YELLOW}${warn_count} ${wlabel}${NC}"
+    fi
+    if (( err_count > 0 )); then
+        local elabel="error"; (( err_count > 1 )) && elabel="errors"
+        summary+=", ${RED}${err_count} ${elabel}${NC}"
+    fi
+    echo -e "Summary: $summary"
+    echo ""
 }
 
 # --- LOGS ---
@@ -1047,10 +1286,870 @@ cmd_logs() {
     cat "$log_file"
 }
 
+# --- FEATURE ---
+cmd_feature() {
+    local subcmd="${1:-}"
+    shift || true
+
+    case "$subcmd" in
+        start)   feature_start "$@" ;;
+        status)  feature_status "$@" ;;
+        commit)  feature_commit "$@" ;;
+        push)    feature_push "$@" ;;
+        pr)      feature_pr "$@" ;;
+        merge)   feature_merge "$@" ;;
+        abandon) feature_abandon "$@" ;;
+        *)
+            echo -e "${RED}Usage:${NC} hq feature <start|status|commit|push|pr|merge|abandon> [args]"
+            echo ""
+            echo "  hq feature start <name> [--repos=A,B,C]"
+            echo "  hq feature status <name>"
+            echo "  hq feature commit <name> -m \"message\""
+            echo "  hq feature push <name>"
+            echo "  hq feature pr <name> [--title \"...\"] [--body \"...\"]"
+            echo "  hq feature merge <name> [--auto]"
+            echo "  hq feature abandon <name>"
+            exit 1
+            ;;
+    esac
+}
+
+# Resolve project path from projects.json v2 (keyed object, expands ~)
+_feature_resolve_path() {
+    local repo_name="$1"
+    python3 - "$PROJECTS_FILE" "$repo_name" "$HOME" <<'PYEOF'
+import sys, json
+projects_file, repo_name, home = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(projects_file) as f:
+    data = json.load(f)
+projects = data.get("projects", {})
+if repo_name not in projects:
+    sys.exit(1)
+path = projects[repo_name].get("path", "")
+path = path.replace("~", home)
+print(path)
+PYEOF
+}
+
+feature_start() {
+    local name=""
+    local repos_arg=""
+
+    for arg in "$@"; do
+        case "$arg" in
+            --repos=*) repos_arg="${arg#--repos=}" ;;
+            -*) echo -e "${RED}Unknown option:${NC} $arg"; exit 1 ;;
+            *) name="$arg" ;;
+        esac
+    done
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Usage:${NC} hq feature start <name> [--repos=A,B,C]"
+        exit 1
+    fi
+
+    if [[ ! -f "$PROJECTS_FILE" ]]; then
+        echo -e "${RED}Error:${NC} projects.json not found. Run 'hq scan' first."
+        exit 1
+    fi
+
+    # Determine repo list
+    if [[ -z "$repos_arg" ]]; then
+        echo -e "${YELLOW}No --repos specified.${NC}"
+        echo "Enter comma-separated repo names (from projects.json):"
+        read -r repos_arg
+        if [[ -z "$repos_arg" ]]; then
+            echo -e "${RED}Error:${NC} No repos provided."
+            exit 1
+        fi
+    fi
+
+    IFS=',' read -ra repo_names <<< "$repos_arg"
+
+    local branch="feature/$name"
+    local created_repos=()
+
+    # First pass: validate all repos exist before touching any branch
+    for raw_name in "${repo_names[@]}"; do
+        local repo_name
+        repo_name="$(echo "$raw_name" | tr -d '[:space:]')"
+        [[ -z "$repo_name" ]] && continue
+
+        if ! _feature_resolve_path "$repo_name" &>/dev/null; then
+            echo -e "${RED}Error:${NC} Repo '$repo_name' not found in projects.json"
+            exit 1
+        fi
+
+        local repo_path
+        repo_path=$(_feature_resolve_path "$repo_name")
+        if [[ ! -d "$repo_path" ]]; then
+            echo -e "${RED}Error:${NC} Path not found for '$repo_name': $repo_path"
+            exit 1
+        fi
+    done
+
+    # Second pass: create branches
+    for raw_name in "${repo_names[@]}"; do
+        local repo_name repo_path
+        repo_name="$(echo "$raw_name" | tr -d '[:space:]')"
+        [[ -z "$repo_name" ]] && continue
+        repo_path=$(_feature_resolve_path "$repo_name")
+
+        if git -C "$repo_path" checkout -b "$branch" 2>/dev/null; then
+            echo -e "  ${GREEN}+${NC} $repo_name — branch '$branch' created"
+            created_repos+=("$repo_name")
+        elif git -C "$repo_path" show-ref --verify --quiet "refs/heads/$branch" 2>/dev/null; then
+            echo -e "  ${YELLOW}!${NC} $repo_name — branch '$branch' already exists, skipping"
+            created_repos+=("$repo_name")
+        else
+            echo -e "${RED}Error:${NC} Failed to create branch '$branch' in '$repo_name'"
+            # Rollback branches created in this run
+            for rb_name in "${created_repos[@]}"; do
+                local rb_path
+                rb_path=$(_feature_resolve_path "$rb_name") || continue
+                git -C "$rb_path" checkout - 2>/dev/null || true
+                git -C "$rb_path" branch -D "$branch" 2>/dev/null || true
+                echo -e "  ${YELLOW}Rolled back${NC} $rb_name"
+            done
+            exit 1
+        fi
+    done
+
+    if [[ ${#created_repos[@]} -eq 0 ]]; then
+        echo -e "${RED}Error:${NC} No repos were processed."
+        exit 1
+    fi
+
+    # Build repo entries JSON and write state file
+    mkdir -p "$FEATURES_DIR"
+    local feature_file="$FEATURES_DIR/${name}.json"
+
+    python3 - "$feature_file" "$name" "$branch" "$PROJECTS_FILE" "$HOME" "${created_repos[@]}" <<'PYEOF'
+import sys, json
+from datetime import date
+
+feature_file  = sys.argv[1]
+name          = sys.argv[2]
+branch        = sys.argv[3]
+projects_file = sys.argv[4]
+home          = sys.argv[5]
+repo_names    = sys.argv[6:]
+
+with open(projects_file) as f:
+    data = json.load(f)
+all_projects = data.get("projects", {})
+
+repos = []
+for rname in repo_names:
+    path = all_projects.get(rname, {}).get("path", "").replace("~", home)
+    repos.append({
+        "name": rname,
+        "path": path,
+        "branch": branch,
+        "pr": None,
+        "status": "local"
+    })
+
+state = {
+    "name": name,
+    "created": str(date.today()),
+    "repos": repos,
+    "linked_pr_group": name
+}
+with open(feature_file, "w") as f:
+    json.dump(state, f, indent=2)
+PYEOF
+
+    local repos_display
+    repos_display=$(IFS=', '; echo "${created_repos[*]}")
+    echo ""
+    echo -e "${GREEN}Feature '$name' started in:${NC} $repos_display"
+    echo "State saved to: $feature_file"
+}
+
+feature_status() {
+    local name="${1:-}"
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Usage:${NC} hq feature status <name>"
+        exit 1
+    fi
+
+    local feature_file="$FEATURES_DIR/${name}.json"
+
+    if [[ ! -f "$feature_file" ]]; then
+        echo -e "${RED}Error:${NC} Feature '$name' not found (expected: $feature_file)"
+        exit 1
+    fi
+
+    echo -e "\n${BOLD}Feature: $name${NC}"
+    echo ""
+
+    python3 - "$feature_file" <<'PYEOF'
+import sys, json, subprocess
+
+feature_file = sys.argv[1]
+with open(feature_file) as f:
+    state = json.load(f)
+
+BOLD   = "\033[1m"
+GREEN  = "\033[0;32m"
+YELLOW = "\033[1;33m"
+GRAY   = "\033[0;90m"
+NC     = "\033[0m"
+
+print(f"  Created:  {state.get('created', '-')}")
+print(f"  PR group: {state.get('linked_pr_group', '-')}")
+print()
+
+for repo in state.get("repos", []):
+    rname  = repo["name"]
+    path   = repo["path"]
+    branch = repo["branch"]
+    status = repo.get("status", "unknown")
+
+    print(f"  {BOLD}{rname}{NC}  [{branch}]  status={status}")
+
+    # Uncommitted changes
+    try:
+        r = subprocess.run(
+            ["git", "-C", path, "status", "--short"],
+            capture_output=True, text=True
+        )
+        lines = [l for l in r.stdout.strip().splitlines() if l]
+        if lines:
+            print(f"    {YELLOW}Uncommitted changes: {len(lines)}{NC}")
+            for l in lines[:5]:
+                print(f"      {l}")
+            if len(lines) > 5:
+                print(f"      ... and {len(lines) - 5} more")
+        else:
+            print(f"    {GREEN}No uncommitted changes{NC}")
+    except Exception as e:
+        print(f"    [git status error: {e}]")
+
+    # Last 3 commits
+    try:
+        r = subprocess.run(
+            ["git", "-C", path, "log", "--oneline", "-3"],
+            capture_output=True, text=True
+        )
+        commits = r.stdout.strip().splitlines()
+        if commits:
+            print(f"    Last commits:")
+            for c in commits:
+                print(f"      {GRAY}{c}{NC}")
+        else:
+            print(f"    No commits yet")
+    except Exception as e:
+        print(f"    [git log error: {e}]")
+
+    print()
+PYEOF
+}
+
+feature_commit() {
+    local name=""
+    local message=""
+    local args=("$@")
+    local i=0
+
+    while [[ $i -lt ${#args[@]} ]]; do
+        local arg="${args[$i]}"
+        case "$arg" in
+            -m)
+                i=$(( i + 1 ))
+                message="${args[$i]:-}"
+                ;;
+            -m*)
+                message="${arg#-m}"
+                ;;
+            -*)
+                echo -e "${RED}Unknown option:${NC} $arg"
+                exit 1
+                ;;
+            *)
+                name="$arg"
+                ;;
+        esac
+        i=$(( i + 1 ))
+    done
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Usage:${NC} hq feature commit <name> -m \"message\""
+        exit 1
+    fi
+
+    if [[ -z "$message" ]]; then
+        echo -e "${RED}Error:${NC} Commit message required (-m \"message\")"
+        exit 1
+    fi
+
+    local feature_file="$FEATURES_DIR/${name}.json"
+
+    if [[ ! -f "$feature_file" ]]; then
+        echo -e "${RED}Error:${NC} Feature '$name' not found (expected: $feature_file)"
+        exit 1
+    fi
+
+    local committed=0
+    local skipped=0
+
+    echo -e "\n${BOLD}Committing feature '$name'${NC}\n"
+
+    local repo_count
+    repo_count=$(python3 -c "import json; d=json.load(open('$feature_file')); print(len(d.get('repos', [])))")
+
+    for i in $(seq 0 $(( repo_count - 1 ))); do
+        local repo_name repo_path
+        repo_name=$(python3 -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i]['name'])")
+        repo_path=$(python3 -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i]['path'])")
+
+        if [[ ! -d "$repo_path" ]]; then
+            echo -e "  ${YELLOW}[skip]${NC} $repo_name: path not found ($repo_path)"
+            skipped=$(( skipped + 1 ))
+            continue
+        fi
+
+        local porcelain
+        porcelain=$(git -C "$repo_path" status --porcelain 2>/dev/null || true)
+
+        if [[ -z "$porcelain" ]]; then
+            echo -e "  ${GRAY}[skip]${NC} $repo_name: no changes"
+            skipped=$(( skipped + 1 ))
+        else
+            if git -C "$repo_path" add -A && git -C "$repo_path" commit -m "$message"; then
+                echo -e "  ${GREEN}[committed]${NC} $repo_name"
+                committed=$(( committed + 1 ))
+            else
+                echo -e "  ${RED}[error]${NC} $repo_name: commit failed"
+                skipped=$(( skipped + 1 ))
+            fi
+        fi
+    done
+
+    echo ""
+    echo -e "${GREEN}Done.${NC} Committed in $committed repo(s), skipped $skipped repo(s)."
+}
+
+# Helper: derive owner/repo from a git remote URL
+_feature_owner_repo() {
+    local path="$1"
+    local remote_url
+    remote_url=$(git -C "$path" remote get-url origin 2>/dev/null || true)
+    # Support both https://github.com/owner/repo and git@github.com:owner/repo
+    python3 -c "
+import sys, re
+url = '''$remote_url'''
+m = re.search(r'github\.com[:/](.+?)(?:\.git)?$', url)
+print(m.group(1) if m else '')
+"
+}
+
+# --- FEATURE PUSH ---
+feature_push() {
+    local name="${1:-}"
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Usage:${NC} hq feature push <name>"
+        exit 1
+    fi
+
+    local feature_file="$FEATURES_DIR/${name}.json"
+
+    if [[ ! -f "$feature_file" ]]; then
+        echo -e "${RED}Error:${NC} Feature '$name' not found (expected: $feature_file)"
+        exit 1
+    fi
+
+    echo -e "\n${BOLD}Pushing feature '$name'${NC}\n"
+
+    python3 - "$feature_file" <<'PYEOF'
+import sys, json, subprocess
+
+feature_file = sys.argv[1]
+with open(feature_file) as f:
+    state = json.load(f)
+
+GREEN  = "\033[0;32m"
+YELLOW = "\033[1;33m"
+NC     = "\033[0m"
+
+pushed  = []
+skipped = []
+
+for repo in state.get("repos", []):
+    rname  = repo["name"]
+    path   = repo["path"]
+    branch = repo["branch"]
+    status = repo.get("status", "local")
+
+    if status != "local":
+        skipped.append(f"{rname} (status: {status})")
+        continue
+
+    result = subprocess.run(
+        ["git", "-C", path, "push", "-u", "origin", branch],
+        capture_output=True, text=True
+    )
+    if result.returncode == 0:
+        repo["status"] = "pushed"
+        pushed.append(rname)
+    else:
+        print(f"  {YELLOW}[error]{NC} {rname}: {result.stderr.strip()}")
+        skipped.append(f"{rname} (push failed)")
+
+with open(feature_file, "w") as f:
+    json.dump(state, f, indent=2)
+
+pushed_str  = ", ".join(pushed)  if pushed  else "none"
+skipped_str = " | ".join(f"\u23ed\ufe0f Skipped: {s}" for s in skipped) if skipped else ""
+
+line = f"\u2705 Pushed: {pushed_str}"
+if skipped_str:
+    line += f" | {skipped_str}"
+print(line)
+PYEOF
+}
+
+# --- FEATURE PR ---
+feature_pr() {
+    local name=""
+    local title=""
+    local body=""
+    local args=("$@")
+    local i=0
+
+    while [[ $i -lt ${#args[@]} ]]; do
+        local arg="${args[$i]}"
+        case "$arg" in
+            --title)
+                i=$(( i + 1 ))
+                title="${args[$i]:-}"
+                ;;
+            --title=*)
+                title="${arg#--title=}"
+                ;;
+            --body)
+                i=$(( i + 1 ))
+                body="${args[$i]:-}"
+                ;;
+            --body=*)
+                body="${arg#--body=}"
+                ;;
+            -*)
+                echo -e "${RED}Unknown option:${NC} $arg"
+                exit 1
+                ;;
+            *)
+                name="$arg"
+                ;;
+        esac
+        i=$(( i + 1 ))
+    done
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Usage:${NC} hq feature pr <name> [--title \"...\"] [--body \"...\"]"
+        exit 1
+    fi
+
+    local feature_file="$FEATURES_DIR/${name}.json"
+
+    if [[ ! -f "$feature_file" ]]; then
+        echo -e "${RED}Error:${NC} Feature '$name' not found (expected: $feature_file)"
+        exit 1
+    fi
+
+    # Default title
+    if [[ -z "$title" ]]; then
+        title="feat: $name"
+    fi
+
+    echo -e "\n${BOLD}Creating PRs for feature '$name'${NC}\n"
+
+    local repo_count
+    repo_count=$(python3 -c "import json; d=json.load(open('$feature_file')); print(len(d.get('repos', [])))")
+
+    local updated_any=false
+
+    for i in $(seq 0 $(( repo_count - 1 ))); do
+        local repo_name repo_path repo_branch repo_status repo_pr
+        repo_name=$(python3   -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i]['name'])")
+        repo_path=$(python3   -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i]['path'])")
+        repo_branch=$(python3 -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i]['branch'])")
+        repo_status=$(python3 -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i].get('status','local'))")
+
+        if [[ "$repo_status" == "local" ]]; then
+            echo -e "  ${YELLOW}[skip]${NC} $repo_name — push first (status: local)"
+            continue
+        fi
+
+        if [[ "$repo_status" == "pr_open" ]]; then
+            local existing_pr
+            existing_pr=$(python3 -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i].get('pr') or '')")
+            echo -e "  ${YELLOW}[skip]${NC} $repo_name — PR already open (#$existing_pr)"
+            continue
+        fi
+
+        if [[ "$repo_status" == "merged" || "$repo_status" == "abandoned" ]]; then
+            echo -e "  ${YELLOW}[skip]${NC} $repo_name — status: $repo_status"
+            continue
+        fi
+
+        # Derive owner/repo
+        local owner_repo
+        owner_repo=$(_feature_owner_repo "$repo_path")
+        if [[ -z "$owner_repo" ]]; then
+            echo -e "  ${RED}[error]${NC} $repo_name — could not determine GitHub owner/repo"
+            continue
+        fi
+
+        local full_body="$body"$'\n\n'"🔗 Part of feature group: $name"
+
+        local pr_url
+        pr_url=$(gh pr create \
+            --repo "$owner_repo" \
+            --title "$title" \
+            --body "$full_body" \
+            --label "feature-group/$name" \
+            --head "$repo_branch" \
+            2>&1) || true
+
+        if echo "$pr_url" | grep -q "https://github.com"; then
+            # Extract PR number from URL
+            local pr_number
+            pr_number=$(echo "$pr_url" | grep -oE 'https://github\.com/[^/]+/[^/]+/pull/([0-9]+)' | grep -oE '[0-9]+$' || echo "")
+
+            # Update state file
+            python3 - "$feature_file" "$i" "$pr_number" <<'PYEOF'
+import sys, json
+feature_file = sys.argv[1]
+idx          = int(sys.argv[2])
+pr_number    = sys.argv[3]
+with open(feature_file) as f:
+    state = json.load(f)
+state["repos"][idx]["status"] = "pr_open"
+state["repos"][idx]["pr"]     = int(pr_number) if pr_number.isdigit() else pr_number
+with open(feature_file, "w") as f:
+    json.dump(state, f, indent=2)
+PYEOF
+            updated_any=true
+            echo -e "  ${GREEN}[created]${NC} $repo_name — $pr_url"
+        else
+            echo -e "  ${RED}[error]${NC} $repo_name — gh pr create failed:"
+            echo "    $pr_url"
+        fi
+    done
+
+    if [[ "$updated_any" == "true" ]]; then
+        echo ""
+        echo -e "${GREEN}Done.${NC} State updated in $feature_file"
+    fi
+}
+
+# --- FEATURE MERGE ---
+feature_merge() {
+    local name=""
+    local auto_mode=false
+    local args=("$@")
+    local i=0
+
+    while [[ $i -lt ${#args[@]} ]]; do
+        local arg="${args[$i]}"
+        case "$arg" in
+            --auto) auto_mode=true ;;
+            -*)
+                echo -e "${RED}Unknown option:${NC} $arg"
+                exit 1
+                ;;
+            *) name="$arg" ;;
+        esac
+        i=$(( i + 1 ))
+    done
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Usage:${NC} hq feature merge <name> [--auto]"
+        exit 1
+    fi
+
+    local feature_file="$FEATURES_DIR/${name}.json"
+
+    if [[ ! -f "$feature_file" ]]; then
+        echo -e "${RED}Error:${NC} Feature '$name' not found (expected: $feature_file)"
+        exit 1
+    fi
+
+    echo -e "\n${BOLD}Merging feature '$name'${NC}\n"
+
+    # Build ordered repo list using depends_on topological sort from projects.json
+    local ordered_repos
+    ordered_repos=$(python3 - "$feature_file" "$PROJECTS_FILE" <<'PYEOF'
+import sys, json
+from collections import defaultdict, deque
+
+feature_file  = sys.argv[1]
+projects_file = sys.argv[2]
+
+with open(feature_file) as f:
+    state = json.load(f)
+with open(projects_file) as f:
+    pdata = json.load(f)
+
+# Support both array and object schema for projects.json
+if isinstance(pdata, dict) and "projects" in pdata:
+    all_projects = pdata["projects"]
+    def get_deps(name):
+        return all_projects.get(name, {}).get("depends_on", [])
+elif isinstance(pdata, list):
+    all_projects = {p["name"]: p for p in pdata}
+    def get_deps(name):
+        return all_projects.get(name, {}).get("depends_on", [])
+else:
+    all_projects = {}
+    def get_deps(name):
+        return []
+
+repo_names = [r["name"] for r in state.get("repos", [])]
+repo_set   = set(repo_names)
+
+# Build adjacency (dependency must come first)
+in_degree  = defaultdict(int)
+adj        = defaultdict(list)
+
+for rname in repo_names:
+    for dep in get_deps(rname):
+        if dep in repo_set:
+            adj[dep].append(rname)
+            in_degree[rname] += 1
+
+queue = deque([r for r in repo_names if in_degree[r] == 0])
+order = []
+while queue:
+    node = queue.popleft()
+    order.append(node)
+    for nxt in adj[node]:
+        in_degree[nxt] -= 1
+        if in_degree[nxt] == 0:
+            queue.append(nxt)
+
+# Append any remaining (cycle fallback)
+for r in repo_names:
+    if r not in order:
+        order.append(r)
+
+print("\n".join(order))
+PYEOF
+)
+
+    local merged_count=0
+    local failed=false
+
+    while IFS= read -r repo_name; do
+        [[ -z "$repo_name" ]] && continue
+
+        # Read repo state
+        local repo_status repo_pr repo_path
+        repo_status=$(python3 -c "
+import json
+state = json.load(open('$feature_file'))
+repo = next((r for r in state['repos'] if r['name'] == '$repo_name'), None)
+print(repo.get('status','') if repo else '')
+")
+        repo_pr=$(python3 -c "
+import json
+state = json.load(open('$feature_file'))
+repo = next((r for r in state['repos'] if r['name'] == '$repo_name'), None)
+print(repo.get('pr') or '' if repo else '')
+")
+        repo_path=$(python3 -c "
+import json
+state = json.load(open('$feature_file'))
+repo = next((r for r in state['repos'] if r['name'] == '$repo_name'), None)
+print(repo.get('path','') if repo else '')
+")
+
+        if [[ "$repo_status" != "pr_open" ]]; then
+            echo -e "  ${YELLOW}[skip]${NC} $repo_name — status: $repo_status (expected pr_open)"
+            continue
+        fi
+
+        if [[ -z "$repo_pr" ]]; then
+            echo -e "  ${YELLOW}[skip]${NC} $repo_name — no PR number recorded"
+            continue
+        fi
+
+        local owner_repo
+        owner_repo=$(_feature_owner_repo "$repo_path")
+        if [[ -z "$owner_repo" ]]; then
+            echo -e "  ${RED}[error]${NC} $repo_name — could not determine GitHub owner/repo"
+            continue
+        fi
+
+        if [[ "$auto_mode" == "true" ]]; then
+            # Check CI status
+            local ci_result
+            ci_result=$(gh pr view "$repo_pr" --repo "$owner_repo" --json statusCheckRollup 2>/dev/null || echo '{}')
+            local all_pass
+            all_pass=$(python3 -c "
+import json, sys
+data = json.loads('''$ci_result''')
+checks = data.get('statusCheckRollup', [])
+if not checks:
+    print('no_checks')
+    sys.exit(0)
+failed = [c for c in checks if c.get('conclusion','') not in ('SUCCESS','NEUTRAL','SKIPPED','') and c.get('status','') == 'COMPLETED']
+pending = [c for c in checks if c.get('status','') not in ('COMPLETED',)]
+if failed:
+    print('failed:' + ','.join(c.get('name','?') for c in failed))
+elif pending:
+    print('pending:' + ','.join(c.get('name','?') for c in pending))
+else:
+    print('pass')
+")
+            if [[ "$all_pass" == "pass" || "$all_pass" == "no_checks" ]]; then
+                echo -e "  ${GREEN}[auto-merge]${NC} $repo_name — PR #$repo_pr"
+            elif [[ "$all_pass" == pending:* ]]; then
+                echo -e "  ${RED}[blocked]${NC} $repo_name — CI checks still pending: ${all_pass#pending:}"
+                echo -e "${RED}Stopping.${NC} Remaining repos not merged."
+                exit 1
+            else
+                echo -e "  ${RED}[blocked]${NC} $repo_name — CI checks failed: ${all_pass#failed:}"
+                echo -e "${RED}Stopping.${NC} Remaining repos not merged."
+                exit 1
+            fi
+        else
+            # Manual prompt
+            echo -n "  Merge PR #$repo_pr in $repo_name? [y/N] "
+            read -r answer
+            if [[ ! "$answer" =~ ^[Yy]$ ]]; then
+                echo -e "  ${YELLOW}[skipped]${NC} $repo_name"
+                continue
+            fi
+        fi
+
+        # Perform merge
+        if gh pr merge "$repo_pr" --repo "$owner_repo" --merge 2>&1; then
+            # Update state
+            python3 - "$feature_file" "$repo_name" <<'PYEOF'
+import sys, json
+feature_file = sys.argv[1]
+repo_name    = sys.argv[2]
+with open(feature_file) as f:
+    state = json.load(f)
+for repo in state["repos"]:
+    if repo["name"] == repo_name:
+        repo["status"] = "merged"
+        break
+with open(feature_file, "w") as f:
+    json.dump(state, f, indent=2)
+PYEOF
+            echo -e "  ${GREEN}[merged]${NC} $repo_name — PR #$repo_pr"
+            merged_count=$(( merged_count + 1 ))
+        else
+            echo -e "  ${RED}[error]${NC} $repo_name — merge failed"
+            if [[ "$auto_mode" == "true" ]]; then
+                echo -e "${RED}Stopping in --auto mode.${NC} Remaining repos not merged."
+                exit 1
+            fi
+            echo -n "  Continue anyway? [y/N] "
+            read -r cont
+            if [[ ! "$cont" =~ ^[Yy]$ ]]; then
+                echo -e "${YELLOW}Stopped.${NC} Some repos may still have open PRs."
+                exit 1
+            fi
+        fi
+    done <<< "$ordered_repos"
+
+    echo ""
+    echo -e "${GREEN}Done.${NC} Merged $merged_count PR(s)."
+}
+
+# --- FEATURE ABANDON ---
+feature_abandon() {
+    local name="${1:-}"
+
+    if [[ -z "$name" ]]; then
+        echo -e "${RED}Usage:${NC} hq feature abandon <name>"
+        exit 1
+    fi
+
+    local feature_file="$FEATURES_DIR/${name}.json"
+
+    if [[ ! -f "$feature_file" ]]; then
+        echo -e "${RED}Error:${NC} Feature '$name' not found (expected: $feature_file)"
+        exit 1
+    fi
+
+    echo -e "\n${BOLD}Abandoning feature '$name'${NC}\n"
+
+    local repo_count
+    repo_count=$(python3 -c "import json; d=json.load(open('$feature_file')); print(len(d.get('repos', [])))")
+
+    local cleaned=()
+
+    for i in $(seq 0 $(( repo_count - 1 ))); do
+        local repo_name repo_path repo_branch repo_status repo_pr
+        repo_name=$(python3   -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i]['name'])")
+        repo_path=$(python3   -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i]['path'])")
+        repo_branch=$(python3 -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i]['branch'])")
+        repo_status=$(python3 -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i].get('status','local'))")
+        repo_pr=$(python3     -c "import json; d=json.load(open('$feature_file')); print(d['repos'][$i].get('pr') or '')")
+
+        if [[ ! -d "$repo_path" ]]; then
+            echo -e "  ${YELLOW}[skip]${NC} $repo_name — path not found ($repo_path)"
+            continue
+        fi
+
+        # Checkout main/master
+        git -C "$repo_path" checkout main 2>/dev/null || \
+            git -C "$repo_path" checkout master 2>/dev/null || true
+
+        # Delete local branch
+        if git -C "$repo_path" branch -D "$repo_branch" 2>/dev/null; then
+            echo -e "  ${GREEN}[deleted local]${NC} $repo_name — $repo_branch"
+        else
+            echo -e "  ${YELLOW}[no local branch]${NC} $repo_name — $repo_branch"
+        fi
+
+        # Delete remote branch if pushed
+        if [[ "$repo_status" == "pushed" || "$repo_status" == "pr_open" ]]; then
+            if git -C "$repo_path" push origin --delete "$repo_branch" 2>/dev/null; then
+                echo -e "  ${GREEN}[deleted remote]${NC} $repo_name — origin/$repo_branch"
+            else
+                echo -e "  ${YELLOW}[remote branch not found]${NC} $repo_name — origin/$repo_branch"
+            fi
+        fi
+
+        # Close open PR
+        if [[ "$repo_status" == "pr_open" && -n "$repo_pr" ]]; then
+            local owner_repo
+            owner_repo=$(_feature_owner_repo "$repo_path")
+            if [[ -n "$owner_repo" ]]; then
+                if gh pr close "$repo_pr" --repo "$owner_repo" 2>/dev/null; then
+                    echo -e "  ${GREEN}[closed PR]${NC} $repo_name — #$repo_pr"
+                else
+                    echo -e "  ${YELLOW}[PR close failed]${NC} $repo_name — #$repo_pr"
+                fi
+            fi
+        fi
+
+        cleaned+=("$repo_name")
+    done
+
+    # Delete state file
+    rm -f "$feature_file"
+
+    local cleaned_str
+    cleaned_str=$(IFS=', '; echo "${cleaned[*]}")
+    echo ""
+    echo -e "${GREEN}✅ Abandoned feature '$name'${NC} — branches deleted in: $cleaned_str"
+}
+
 # --- MAIN ---
 case "${1:-}" in
     scan)       shift; cmd_scan "$@" ;;
     new)        shift; cmd_new "$@" ;;
+    session)    shift; cmd_session "$@" ;;
     dispatch)   shift; cmd_dispatch "$@" ;;
     status)     shift; cmd_status "$@" ;;
     sprint)     shift; cmd_sprint "$@" ;;
@@ -1062,6 +2161,8 @@ case "${1:-}" in
     logs)       shift; cmd_logs "$@" ;;
     sync)       shift; exec "$HQ_DIR/scripts/sync-ecosystem.sh" "$@" ;;
     bootstrap)  shift; cmd_bootstrap "$@" ;;
+    doctor)     shift; cmd_doctor "$@" ;;
+    feature)    shift; cmd_feature "$@" ;;
     --help|-h)  usage ;;
     *)          usage ;;
 esac

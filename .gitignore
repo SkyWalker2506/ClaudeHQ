@@ -1,5 +1,7 @@
 progress/
 .claude/
+workspaces/
+features/
 
 # Claude Code
 .claude/settings.local.json

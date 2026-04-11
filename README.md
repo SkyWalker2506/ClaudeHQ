@@ -125,11 +125,11 @@ ClaudeHQ includes a CLI tool (`scripts/hq`) for managing sprints, dispatching Cl
 ./scripts/hq sprint init VocabLearningApp
 # Edit sprints/VocabLearningApp/sprint-1.json to define tasks
 
-# 3. Dispatch Claude to work on a project
-./scripts/hq dispatch VocabLearningApp
+# 3. Launch a Claude session for a project
+./scripts/hq session VocabLearningApp
 
-# 4. Dispatch ALL active projects at once
-./scripts/hq dispatch --all
+# 4. Launch sessions for ALL active projects at once
+./scripts/hq session --all
 
 # 5. Monitor progress
 ./scripts/hq status              # Dashboard view
@@ -145,7 +145,8 @@ ClaudeHQ includes a CLI tool (`scripts/hq`) for managing sprints, dispatching Cl
 |---------|-------------|
 | `hq scan` | Scan ~/Projects for CLAUDE.md projects, generate projects.json |
 | `hq new <name> [--jira KEY]` | Create a new project with full ecosystem setup |
-| `hq dispatch <project\|--all>` | Launch Claude session(s) in background |
+| `hq session <project\|--all>` | Launch Claude session(s) in background |
+| `hq dispatch <project\|--all>` | Deprecated alias for `hq session` |
 | `hq status [project]` | Show project status dashboard |
 | `hq sprint plan <project>` | Launch AI-powered sprint planning |
 | `hq sprint list [project]` | List all sprints |

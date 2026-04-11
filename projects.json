@@ -1,27 +1,265 @@
 {
-  "workspace": "~/Projects",
-  "projects": [
-    {"name": "ar-research", "path": "~/Projects/ar-research", "jira": "AR", "git": "SkyWalker2506/ar-research"},
-    {"name": "ByteCraftHQ", "path": "~/Projects/ByteCraftHQ", "jira": "BYT", "git": "SkyWalker2506/bytecraft-hq"},
-    {"name": "Viralyze", "path": "~/Projects/Viralyze", "jira": "VIR", "git": "SkyWalker2506/Viralyze"},
-    {"name": "VocabLearningApp", "path": "~/Projects/VocabLearningApp", "jira": "VOC", "git": "SkyWalker2506/vocab-learning-app"},
-    {"name": "football-ai-platform", "path": "~/Projects/football-ai-platform", "jira": null, "git": "BlackMountainsStudio/tartismalipozisyonlar"},
-    {"name": "KnightOnlineAI", "path": "~/Projects/KnightOnlineAI", "jira": "KOAI", "git": "SkyWalker2506/KnightOnlineAI"},
-    {"name": "ProjeBirlik", "path": "~/Projects/ProjeBirlik", "jira": "PROJ", "git": "SkyWalker2506/projebirlik"},
-    {"name": "trading-bot", "path": "~/Projects/trading-bot", "jira": "TB", "git": "SkyWalker2506/trading-bot"},
-    {"name": "transcriptr", "path": "~/Projects/transcriptr", "jira": "TSCR", "git": "SkyWalker2506/transcriptr"},
-    {"name": "claude-config", "path": "~/Projects/claude-config", "jira": "CC", "git": "SkyWalker2506/claude-config"},
-    {"name": "claude-marketplace", "path": "~/Projects/claude-marketplace", "jira": null, "git": "SkyWalker2506/claude-marketplace"},
-    {"name": "CoinHQ", "path": "~/Projects/CoinHQ", "jira": "COIN", "git": "SkyWalker2506/CoinHQ"},
-    {"name": "ClaudeHQ", "path": "~/Projects/ClaudeHQ", "jira": "CHQ", "git": "SkyWalker2506/ClaudeHQ"},
-    {"name": "Gardirop", "path": "~/Projects/Gardirop", "jira": "GARD", "git": "SkyWalker2506/gardirop"},
-    {"name": "RefinUp", "path": "~/Projects/RefinUp", "jira": null, "git": "SkyWalker2506/RefinUp"},
-    {"name": "ArtLift", "path": "~/Projects/ArtLift", "jira": "ART", "git": "SkyWalker2506/ArtLift"},
-    {"name": "ccplugin-backend-forge", "path": "~/Projects/ccplugin-backend-forge", "jira": "CHQ", "git": "SkyWalker2506/ccplugin-backend-forge"},
-    {"name": "LudoMultiplayer", "path": "~/Projects/LudoMultiplayer", "jira": null, "git": "SkyWalker2506/ludo-multiplayer"},
-    {"name": "claude-design-system", "path": "~/Projects/claude-design-system", "jira": "CDS", "git": "SkyWalker2506/claude-design-system"},
-    {"name": "ccplugin-3d-forge", "path": "~/Projects/ccplugin-3d-forge", "jira": "TDF", "git": "SkyWalker2506/ccplugin-3d-forge"},
-    {"name": "craft-unity", "path": "~/Projects/craft-unity", "jira": "CHQ", "git": "SkyWalker2506/craft-unity"},
-    {"name": "ccplugin-unity-craft", "path": "~/Projects/ccplugin-unity-craft", "jira": "CHQ", "git": "SkyWalker2506/ccplugin-unity-craft"}
-  ]
+  "version": "2.0",
+  "projects": {
+    "claude-config": {
+      "path": "~/Projects/claude-config",
+      "category": "ecosystem-foundation",
+      "role": "primary",
+      "depends_on": [],
+      "dependents": ["claude-agent-catalog", "claude-marketplace", "ClaudeHQ", "GptModels"],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/claude-config",
+      "visibility": "public"
+    },
+    "claude-agent-catalog": {
+      "path": "~/Projects/claude-agent-catalog",
+      "category": "ecosystem-content",
+      "role": "synced",
+      "depends_on": ["claude-config"],
+      "dependents": [],
+      "sync_triggers": ["agents/**", "config/**"],
+      "workspace_link": "workspaces/claude-agent-catalog",
+      "visibility": "public"
+    },
+    "claude-marketplace": {
+      "path": "~/Projects/claude-marketplace",
+      "category": "ecosystem-content",
+      "role": "synced",
+      "depends_on": ["claude-config"],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/claude-marketplace",
+      "visibility": "public"
+    },
+    "ClaudeHQ": {
+      "path": "~/Projects/ClaudeHQ",
+      "category": "ecosystem-foundation",
+      "role": "primary",
+      "depends_on": ["claude-config"],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/ClaudeHQ",
+      "visibility": "public"
+    },
+    "claude-secrets": {
+      "path": "~/Projects/claude-secrets",
+      "category": "ecosystem-private",
+      "role": "private-knowledge",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/claude-secrets",
+      "visibility": "private"
+    },
+    "GptModels": {
+      "path": "~/Projects/GptModels",
+      "category": "ecosystem-private",
+      "role": "private-knowledge",
+      "depends_on": ["claude-config"],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/GptModels",
+      "visibility": "private"
+    },
+    "ar-research": {
+      "path": "~/Projects/ar-research",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/ar-research",
+      "visibility": "public"
+    },
+    "ByteCraftHQ": {
+      "path": "~/Projects/ByteCraftHQ",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/ByteCraftHQ",
+      "visibility": "public"
+    },
+    "Viralyze": {
+      "path": "~/Projects/Viralyze",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/Viralyze",
+      "visibility": "public"
+    },
+    "VocabLearningApp": {
+      "path": "~/Projects/VocabLearningApp",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/VocabLearningApp",
+      "visibility": "public"
+    },
+    "football-ai-platform": {
+      "path": "~/Projects/football-ai-platform",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/football-ai-platform",
+      "visibility": "public"
+    },
+    "KnightOnlineAI": {
+      "path": "~/Projects/KnightOnlineAI",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/KnightOnlineAI",
+      "visibility": "public"
+    },
+    "ProjeBirlik": {
+      "path": "~/Projects/ProjeBirlik",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/ProjeBirlik",
+      "visibility": "public"
+    },
+    "trading-bot": {
+      "path": "~/Projects/trading-bot",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/trading-bot",
+      "visibility": "public"
+    },
+    "transcriptr": {
+      "path": "~/Projects/transcriptr",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/transcriptr",
+      "visibility": "public"
+    },
+    "CoinHQ": {
+      "path": "~/Projects/CoinHQ",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/CoinHQ",
+      "visibility": "public"
+    },
+    "Gardirop": {
+      "path": "~/Projects/Gardirop",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/Gardirop",
+      "visibility": "public"
+    },
+    "RefinUp": {
+      "path": "~/Projects/RefinUp",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/RefinUp",
+      "visibility": "public"
+    },
+    "ArtLift": {
+      "path": "~/Projects/ArtLift",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/ArtLift",
+      "visibility": "public"
+    },
+    "ccplugin-backend-forge": {
+      "path": "~/Projects/ccplugin-backend-forge",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/ccplugin-backend-forge",
+      "visibility": "public"
+    },
+    "LudoMultiplayer": {
+      "path": "~/Projects/LudoMultiplayer",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/LudoMultiplayer",
+      "visibility": "public"
+    },
+    "claude-design-system": {
+      "path": "~/Projects/claude-design-system",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/claude-design-system",
+      "visibility": "public"
+    },
+    "ccplugin-3d-forge": {
+      "path": "~/Projects/ccplugin-3d-forge",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/ccplugin-3d-forge",
+      "visibility": "public"
+    },
+    "craft-unity": {
+      "path": "~/Projects/craft-unity",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/craft-unity",
+      "visibility": "public"
+    },
+    "ccplugin-unity-craft": {
+      "path": "~/Projects/ccplugin-unity-craft",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/ccplugin-unity-craft",
+      "visibility": "public"
+    },
+    "3d-asset-foundry": {
+      "path": "~/Projects/3d-asset-foundry",
+      "category": "user-project",
+      "role": "product",
+      "depends_on": [],
+      "dependents": [],
+      "sync_triggers": [],
+      "workspace_link": "workspaces/3d-asset-foundry",
+      "visibility": "public"
+    }
+  }
 }
