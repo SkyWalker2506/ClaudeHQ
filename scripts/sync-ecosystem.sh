@@ -5,7 +5,7 @@ set -euo pipefail
 # Usage: ./scripts/sync-ecosystem.sh [--dry-run]
 #
 # Source of truth:
-#   Agents     → claude-config/agents/**/*.md (excl README.md)
+#   Agents     → claude-config/agents/*/*/AGENT.md
 #   Categories → claude-config/agents/*/
 #   Plugins    → ccplugin-* directories in ~/Projects
 #   Skills     → claude-config/global/skills/*/
@@ -34,8 +34,8 @@ AGENTS_DIR="$PROJECTS_ROOT/claude-config/agents"
 SKILLS_DIR="$PROJECTS_ROOT/claude-config/global/skills"
 MARKETPLACE_JSON="$PROJECTS_ROOT/claude-marketplace/.claude-plugin/marketplace.json"
 
-agent_count=$(find "$AGENTS_DIR" -mindepth 2 -maxdepth 2 -name "AGENT.md" 2>/dev/null | wc -l | tr -d ' ')
-category_count=$(find "$AGENTS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+agent_count=$(find "$AGENTS_DIR" -mindepth 3 -maxdepth 3 -name "AGENT.md" 2>/dev/null | wc -l | tr -d ' ')
+category_count=$(find "$AGENTS_DIR" -mindepth 1 -maxdepth 1 -type d ! -name "_template" 2>/dev/null | wc -l | tr -d ' ')
 plugin_repo_count=$(find "$PROJECTS_ROOT" -maxdepth 1 -name "ccplugin-*" -type d 2>/dev/null | wc -l | tr -d ' ')
 marketplace_count=$(jq '.plugins | length' "$MARKETPLACE_JSON" 2>/dev/null || echo 0)
 skill_count=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
