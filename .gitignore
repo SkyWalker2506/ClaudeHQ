@@ -29,3 +29,9 @@ references/
 # Runtime
 *.log
 *.pid
+
+# MCP servers
+mcp-servers/*/node_modules/
+
+# Generated files
+generated-images/
