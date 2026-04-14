@@ -1,5 +1,11 @@
 {
   "version": "2.0",
+  "forge_wave_order": {
+    "wave_1": ["claude-config"],
+    "wave_2": ["claude-agent-catalog", "claude-marketplace", "ClaudeHQ", "GptModels"],
+    "wave_3": ["ar-research", "ByteCraftHQ", "CoinHQ", "Gardirop", "KnightOnlineAI", "ProjeBirlik", "trading-bot", "transcriptr", "VocabLearningApp", "Viralyze", "football-ai-platform", "RefinUp", "ArtLift", "LudoMultiplayer", "claude-design-system"],
+    "wave_4": ["ccplugin-backend-forge", "ccplugin-3d-forge", "ccplugin-unity-craft", "craft-unity", "3d-asset-foundry"]
+  },
   "projects": {
     "claude-config": {
       "path": "~/Projects/claude-config",
