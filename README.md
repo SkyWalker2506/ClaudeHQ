@@ -54,19 +54,36 @@ That's it. `install.sh` sets up CLAUDE.md redirectors, MCP servers, skills, and 
 
 ## Projects
 
-Managed projects in the ecosystem:
+26 managed projects in the ecosystem:
 
-| Project | Jira | Description |
-|---------|------|-------------|
-| ar-research | — | AR research & prototyping |
-| ByteCraftHQ | — | ByteCraft studio HQ |
-| Viralyze | — | Social media analytics |
-| VocabLearningApp | VOC | Vocabulary learning app |
-| football-ai-platform | — | Football AI / Tartismali Pozisyonlar |
-| KnightOnlineAI | — | Knight Online AI bot |
-| ProjeBirlik | — | Community project platform |
-| trading-bot | — | Trading automation |
-| transcriptr | — | Transcription tool |
+| Project | Category | Role | GitHub | Visibility |
+|---------|----------|------|--------|------------|
+| claude-config | Ecosystem Foundation | primary | [SkyWalker2506/claude-config](https://github.com/SkyWalker2506/claude-config) | public |
+| ClaudeHQ | Ecosystem Foundation | primary | [SkyWalker2506/ClaudeHQ](https://github.com/SkyWalker2506/ClaudeHQ) | public |
+| claude-agent-catalog | Ecosystem Content | synced | [SkyWalker2506/claude-agent-catalog](https://github.com/SkyWalker2506/claude-agent-catalog) | public |
+| claude-marketplace | Ecosystem Content | synced | [SkyWalker2506/claude-marketplace](https://github.com/SkyWalker2506/claude-marketplace) | public |
+| ar-research | User Project | product | [SkyWalker2506/ar-research](https://github.com/SkyWalker2506/ar-research) | public |
+| ByteCraftHQ | User Project | product | [SkyWalker2506/ByteCraftHQ](https://github.com/SkyWalker2506/ByteCraftHQ) | public |
+| Viralyze | User Project | product | [SkyWalker2506/Viralyze](https://github.com/SkyWalker2506/Viralyze) | public |
+| VocabLearningApp | User Project | product | [SkyWalker2506/VocabLearningApp](https://github.com/SkyWalker2506/VocabLearningApp) | public |
+| football-ai-platform | User Project | product | [SkyWalker2506/football-ai-platform](https://github.com/SkyWalker2506/football-ai-platform) | public |
+| KnightOnlineAI | User Project | product | [SkyWalker2506/KnightOnlineAI](https://github.com/SkyWalker2506/KnightOnlineAI) | public |
+| ProjeBirlik | User Project | product | [SkyWalker2506/ProjeBirlik](https://github.com/SkyWalker2506/ProjeBirlik) | public |
+| trading-bot | User Project | product | [SkyWalker2506/trading-bot](https://github.com/SkyWalker2506/trading-bot) | public |
+| transcriptr | User Project | product | [SkyWalker2506/transcriptr](https://github.com/SkyWalker2506/transcriptr) | public |
+| CoinHQ | User Project | product | [SkyWalker2506/CoinHQ](https://github.com/SkyWalker2506/CoinHQ) | public |
+| Gardirop | User Project | product | [SkyWalker2506/Gardirop](https://github.com/SkyWalker2506/Gardirop) | public |
+| RefinUp | User Project | product | [SkyWalker2506/RefinUp](https://github.com/SkyWalker2506/RefinUp) | public |
+| ArtLift | User Project | product | [SkyWalker2506/ArtLift](https://github.com/SkyWalker2506/ArtLift) | public |
+| ccplugin-backend-forge | User Project | product | [SkyWalker2506/ccplugin-backend-forge](https://github.com/SkyWalker2506/ccplugin-backend-forge) | public |
+| LudoMultiplayer | User Project | product | [SkyWalker2506/LudoMultiplayer](https://github.com/SkyWalker2506/LudoMultiplayer) | public |
+| claude-design-system | User Project | product | [SkyWalker2506/claude-design-system](https://github.com/SkyWalker2506/claude-design-system) | public |
+| ccplugin-3d-forge | User Project | product | [SkyWalker2506/ccplugin-3d-forge](https://github.com/SkyWalker2506/ccplugin-3d-forge) | public |
+| craft-unity | User Project | product | [SkyWalker2506/craft-unity](https://github.com/SkyWalker2506/craft-unity) | public |
+| ccplugin-unity-craft | User Project | product | [SkyWalker2506/ccplugin-unity-craft](https://github.com/SkyWalker2506/ccplugin-unity-craft) | public |
+| 3d-asset-foundry | User Project | product | [SkyWalker2506/3d-asset-foundry](https://github.com/SkyWalker2506/3d-asset-foundry) | public |
+| claude-secrets | Private Knowledge | private-knowledge | — | private |
+| GptModels | Private Knowledge | private-knowledge | — | private |
 
 ---
 
