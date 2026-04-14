@@ -48,6 +48,8 @@ ${BOLD}Commands:${NC}
   sync [--dry-run]                  Sync ecosystem stats to all downstream README pages
   bootstrap [--all]                 Full ecosystem setup on a new machine
   doctor                            Health check: symlinks, paths, git remotes, dep cycles
+  plugin list                       List all plugins with category and install status
+  agent list [category]             List all agents with ID, name, category and active/pool status
 
 ${BOLD}Options:${NC}
   --dry-run                   Show what would happen without executing
@@ -2145,6 +2147,132 @@ feature_abandon() {
     echo -e "${GREEN}✅ Abandoned feature '$name'${NC} — branches deleted in: $cleaned_str"
 }
 
+# --- PLUGIN LIST ---
+cmd_plugin_list() {
+    local registry="$HOME/Projects/claude-config/config/plugin-registry.json"
+    local plugins_base="$HOME/Projects/claude-config"
+
+    if [[ ! -f "$registry" ]]; then
+        echo -e "${RED}Error:${NC} plugin-registry.json not found at $registry"
+        exit 1
+    fi
+
+    echo ""
+    printf "${BOLD}━━ Plugins "
+    printf '━%.0s' {1..51}; echo "${NC}"
+    printf "  ${BOLD}%-4s %-28s %-16s %-10s${NC}\n" "#" "Plugin" "Category" "Status"
+    printf "  %-4s %-28s %-16s %-10s\n" "──" "──────────────────────────" "──────────────" "──────────"
+
+    local count=0
+    local data
+    data=$(python3 - "$registry" "$plugins_base" <<'PYEOF'
+import json, sys, os
+
+with open(sys.argv[1]) as f:
+    data = json.load(f)
+
+plugins_base = sys.argv[2]
+plugins = data.get("plugins", {})
+
+for i, (key, info) in enumerate(plugins.items(), 1):
+    name = info.get("name", key)
+    category = info.get("category", "-")
+    local_path = info.get("local", "")
+    full_path = os.path.join(plugins_base, local_path) if local_path else ""
+    status = "installed" if (full_path and os.path.isdir(full_path)) else "missing"
+    print(f"{i}\t{name}\t{category}\t{status}")
+PYEOF
+)
+
+    while IFS=$'\t' read -r num name category status; do
+        [[ -z "$name" ]] && continue
+        local status_color="$GREEN"
+        [[ "$status" == "missing" ]] && status_color="$YELLOW"
+        printf "  %-4s %-28s %-16s ${status_color}%-10s${NC}\n" "$num" "$name" "$category" "$status"
+        count=$((count + 1))
+    done <<< "$data"
+
+    echo ""
+    echo -e "  ${BOLD}Total: $count plugins${NC}"
+    printf '━%.0s' {1..60}; echo ""
+    echo ""
+}
+
+# --- AGENT LIST ---
+cmd_agent_list() {
+    local filter="${1:-}"
+    local registry="$HOME/Projects/claude-config/config/agent-registry.json"
+
+    if [[ ! -f "$registry" ]]; then
+        echo -e "${RED}Error:${NC} agent-registry.json not found at $registry"
+        exit 1
+    fi
+
+    echo ""
+    if [[ -n "$filter" ]]; then
+        printf "${BOLD}━━ Agents [filter: $filter] "
+        printf '━%.0s' {1..40}; echo "${NC}"
+    else
+        printf "${BOLD}━━ Agents "
+        printf '━%.0s' {1..51}; echo "${NC}"
+    fi
+    printf "  ${BOLD}%-6s %-28s %-18s %-10s${NC}\n" "ID" "Name" "Category" "Status"
+    printf "  %-6s %-28s %-18s %-10s\n" "───" "──────────────────────────" "────────────────" "──────"
+
+    local data
+    data=$(python3 - "$registry" "$filter" <<'PYEOF'
+import json, sys
+
+with open(sys.argv[1]) as f:
+    data = json.load(f)
+
+filter_cat = sys.argv[2].lower() if len(sys.argv) > 2 else ""
+
+active_set = set(data.get("active_agents", []))
+categories = data.get("categories", {})
+agents = data.get("agents", {})
+
+for agent_id, info in agents.items():
+    cat = info.get("category", "-")
+    if filter_cat and filter_cat not in cat.lower() and filter_cat not in agent_id.lower():
+        continue
+    name = info.get("name", agent_id)
+    status = "active" if agent_id in active_set else "pool"
+    cat_label = categories.get(cat, {}).get("description", cat) if cat in categories else cat
+    print(f"{agent_id}\t{name}\t{cat_label}\t{status}")
+PYEOF
+)
+
+    local total=0
+    local active_count=0
+    local pool_count=0
+
+    while IFS=$'\t' read -r agent_id name category status; do
+        [[ -z "$agent_id" ]] && continue
+        local status_icon="🔵"
+        local status_color="$GRAY"
+        if [[ "$status" == "active" ]]; then
+            status_icon="🟢"
+            status_color="$GREEN"
+            active_count=$((active_count + 1))
+        else
+            pool_count=$((pool_count + 1))
+        fi
+        printf "  %-6s %-28s %-18s ${status_color}%s %-6s${NC}\n" "$agent_id" "$name" "$category" "$status_icon" "$status"
+        total=$((total + 1))
+    done <<< "$data"
+
+    echo ""
+    if [[ -n "$filter" ]]; then
+        echo -e "  ${BOLD}Total: $total agents (filter: $filter)${NC}"
+    else
+        echo -e "  ${BOLD}Total: $total agents ($active_count active, $pool_count pool)${NC}"
+        echo -e "  ${GRAY}Filter: hq agent list <category>${NC}"
+    fi
+    printf '━%.0s' {1..60}; echo ""
+    echo ""
+}
+
 # --- MAIN ---
 case "${1:-}" in
     scan)       shift; cmd_scan "$@" ;;
@@ -2163,6 +2291,20 @@ case "${1:-}" in
     bootstrap)  shift; cmd_bootstrap "$@" ;;
     doctor)     shift; cmd_doctor "$@" ;;
     feature)    shift; cmd_feature "$@" ;;
+    plugin)
+        shift
+        case "${1:-}" in
+            list) shift; cmd_plugin_list "$@" ;;
+            *)    echo -e "${RED}Unknown plugin subcommand:${NC} ${1:-}"; echo "Usage: hq plugin list"; exit 1 ;;
+        esac
+        ;;
+    agent)
+        shift
+        case "${1:-}" in
+            list) shift; cmd_agent_list "$@" ;;
+            *)    echo -e "${RED}Unknown agent subcommand:${NC} ${1:-}"; echo "Usage: hq agent list [category]"; exit 1 ;;
+        esac
+        ;;
     --help|-h)  usage ;;
     *)          usage ;;
 esac
