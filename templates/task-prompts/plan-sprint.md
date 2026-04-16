@@ -2,8 +2,20 @@
 
 You are planning **Sprint {{SPRINT_NUMBER}}** for **{{PROJECT_NAME}}**.
 
-## Project Path
-{{PROJECT_PATH}}
+## Contract
+- **Required outputs:** Sprint JSON with 3-7 tasks
+- **Completion gate:** {{COMPLETION_GATE}}
+- **Max tool calls:** {{MAX_TOOL_CALLS}}
+- **Timeout behavior:** {{TIMEOUT_BEHAVIOR}}
+
+## Environment
+- **Project:** {{PROJECT_NAME}}
+- **Path:** {{PROJECT_PATH}}
+- **Branch:** {{CURRENT_BRANCH}}
+- **Tech stack:** {{TECH_STACK}}
+- **Recent commits:** {{RECENT_COMMITS}}
+- **Test command:** {{TEST_COMMAND}}
+- **Build command:** {{BUILD_COMMAND}}
 
 ## Instructions
 
@@ -11,7 +23,7 @@ You are planning **Sprint {{SPRINT_NUMBER}}** for **{{PROJECT_NAME}}**.
    - Read the README, CLAUDE.md, and key source files
    - Check recent git history to understand what's been done
    - Look at open issues or TODOs in the code
-   - Identify the tech stack and architecture
+   - Use the environment info above — don't re-discover the tech stack
 
 2. Design the sprint:
    - Identify 3-7 actionable tasks based on project priorities

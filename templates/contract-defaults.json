@@ -1,0 +1,30 @@
+{
+  "advance": {
+    "max_tool_calls": 50,
+    "completion_gate": "All tests pass, no lint errors, code compiles",
+    "required_outputs": ["source_files", "test_verification"],
+    "verification_retries": 3,
+    "timeout_behavior": "commit WIP and report partial progress"
+  },
+  "review": {
+    "max_tool_calls": 30,
+    "completion_gate": "Review score >= 8/10, all critical issues addressed",
+    "required_outputs": ["review_report"],
+    "verification_retries": 1,
+    "timeout_behavior": "report findings so far"
+  },
+  "status-report": {
+    "max_tool_calls": 20,
+    "completion_gate": "Status JSON written to progress file",
+    "required_outputs": ["status_json"],
+    "verification_retries": 0,
+    "timeout_behavior": "write partial report"
+  },
+  "plan-sprint": {
+    "max_tool_calls": 30,
+    "completion_gate": "Sprint JSON created with 3-7 tasks",
+    "required_outputs": ["sprint_json"],
+    "verification_retries": 0,
+    "timeout_behavior": "write sprint with tasks planned so far"
+  }
+}
