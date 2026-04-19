@@ -175,6 +175,23 @@ ClaudeHQ includes a CLI tool (`scripts/hq`) for managing sprints, dispatching Cl
 | `hq config [project]` | Show project configuration |
 | `hq logs <project>` | Show session logs |
 | `hq sync [--dry-run]` | Sync ecosystem stats to all downstream README pages |
+| `hq graph install <project>` | Install SessionStart + post-commit graph hooks |
+| `hq graph uninstall <project>` | Remove graph hooks |
+| `hq graph status` | Show graph-cache freshness across projects |
+| `hq graph build <project>` | Build/refresh `.claude/graph-cache.json` |
+| `hq graph docs <project>` | Enrich graph with Markdown/PDF concept nodes |
+| `hq graph transcribe <file>` | Transcribe audio/video via faster-whisper |
+| `hq graph view <project>` | Render and open interactive HTML graph |
+
+### Knowledge Graph (`hq graph`)
+
+A lightweight Graphify-style knowledge graph per project. Build a `.claude/graph-cache.json` once; after that every `claude` session is primed with a concise summary (top hubs, community count, doc count) via a `SessionStart` hook, and each git commit marks the cache stale so you know when to refresh.
+
+- **Basic build mode** (default): walks the file tree, emits file/folder/doc topology.
+- **Claude+MCP mode** (`HQ_GRAPH_USE_CLAUDE=1`): asks jcodemunch MCP for a richer symbol/module graph.
+- **Docs layer**: adds nodes for `.md`/`.mdx`/`.pdf` (via `pdftotext` if available) and links them to files they reference.
+- **View**: standalone `graph.html` with vis.js — community colouring, hub sizing, substring filter.
+- **Transcribe**: optional `faster-whisper` wrapper for audio/video → `.transcript.txt`.
 
 ### How It Works
 
