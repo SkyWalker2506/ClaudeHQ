@@ -50,6 +50,7 @@ ${BOLD}Commands:${NC}
   doctor                            Health check: symlinks, paths, git remotes, dep cycles
   plugin list                       List all plugins with category and install status
   agent list [category]             List all agents with ID, name, category and active/pool status
+  graph <subcommand>                Knowledge-graph utilities (install/build/status/docs/view)
 
 ${BOLD}Options:${NC}
   --dry-run                   Show what would happen without executing
@@ -2305,6 +2306,7 @@ case "${1:-}" in
             *)    echo -e "${RED}Unknown agent subcommand:${NC} ${1:-}"; echo "Usage: hq agent list [category]"; exit 1 ;;
         esac
         ;;
+    graph)      shift; exec bash "$HQ_DIR/scripts/hq-graph.sh" "$@" ;;
     --help|-h)  usage ;;
     *)          usage ;;
 esac
