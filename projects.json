@@ -1,271 +1,506 @@
-{
-  "version": "2.0",
-  "forge_wave_order": {
-    "wave_1": ["claude-config"],
-    "wave_2": ["claude-agent-catalog", "claude-marketplace", "ClaudeHQ", "GptModels"],
-    "wave_3": ["ar-research", "ByteCraftHQ", "CoinHQ", "Gardirop", "KnightOnlineAI", "ProjeBirlik", "trading-bot", "transcriptr", "VocabLearningApp", "Viralyze", "football-ai-platform", "RefinUp", "ArtLift", "LudoMultiplayer", "claude-design-system"],
-    "wave_4": ["ccplugin-backend-forge", "ccplugin-3d-forge", "ccplugin-unity-craft", "craft-unity", "3d-asset-foundry"]
+[
+  {
+    "name": "3d-asset-foundry",
+    "path": "/Users/musabkara/Projects/3d-asset-foundry",
+    "jira": null,
+    "git": "SkyWalker2506/3d-asset-foundry",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
   },
-  "projects": {
-    "claude-config": {
-      "path": "~/Projects/claude-config",
-      "category": "ecosystem-foundation",
-      "role": "primary",
-      "depends_on": [],
-      "dependents": ["claude-agent-catalog", "claude-marketplace", "ClaudeHQ", "GptModels"],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/claude-config",
-      "visibility": "public"
-    },
-    "claude-agent-catalog": {
-      "path": "~/Projects/claude-agent-catalog",
-      "category": "ecosystem-content",
-      "role": "synced",
-      "depends_on": ["claude-config"],
-      "dependents": [],
-      "sync_triggers": ["agents/**", "config/**"],
-      "workspace_link": "workspaces/claude-agent-catalog",
-      "visibility": "public"
-    },
-    "claude-marketplace": {
-      "path": "~/Projects/claude-marketplace",
-      "category": "ecosystem-content",
-      "role": "synced",
-      "depends_on": ["claude-config"],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/claude-marketplace",
-      "visibility": "public"
-    },
-    "ClaudeHQ": {
-      "path": "~/Projects/ClaudeHQ",
-      "category": "ecosystem-foundation",
-      "role": "primary",
-      "depends_on": ["claude-config"],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/ClaudeHQ",
-      "visibility": "public"
-    },
-    "claude-secrets": {
-      "path": "~/Projects/claude-secrets",
-      "category": "ecosystem-private",
-      "role": "private-knowledge",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/claude-secrets",
-      "visibility": "private"
-    },
-    "GptModels": {
-      "path": "~/Projects/GptModels",
-      "category": "ecosystem-private",
-      "role": "private-knowledge",
-      "depends_on": ["claude-config"],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/GptModels",
-      "visibility": "private"
-    },
-    "ar-research": {
-      "path": "~/Projects/ar-research",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/ar-research",
-      "visibility": "public"
-    },
-    "ByteCraftHQ": {
-      "path": "~/Projects/ByteCraftHQ",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/ByteCraftHQ",
-      "visibility": "public"
-    },
-    "Viralyze": {
-      "path": "~/Projects/Viralyze",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/Viralyze",
-      "visibility": "public"
-    },
-    "VocabLearningApp": {
-      "path": "~/Projects/VocabLearningApp",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/VocabLearningApp",
-      "visibility": "public"
-    },
-    "football-ai-platform": {
-      "path": "~/Projects/football-ai-platform",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/football-ai-platform",
-      "visibility": "public"
-    },
-    "KnightOnlineAI": {
-      "path": "~/Projects/KnightOnlineAI",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/KnightOnlineAI",
-      "visibility": "public"
-    },
-    "ProjeBirlik": {
-      "path": "~/Projects/ProjeBirlik",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/ProjeBirlik",
-      "visibility": "public"
-    },
-    "trading-bot": {
-      "path": "~/Projects/trading-bot",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/trading-bot",
-      "visibility": "public"
-    },
-    "transcriptr": {
-      "path": "~/Projects/transcriptr",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/transcriptr",
-      "visibility": "public"
-    },
-    "CoinHQ": {
-      "path": "~/Projects/CoinHQ",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/CoinHQ",
-      "visibility": "public"
-    },
-    "Gardirop": {
-      "path": "~/Projects/Gardirop",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/Gardirop",
-      "visibility": "public"
-    },
-    "RefinUp": {
-      "path": "~/Projects/RefinUp",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/RefinUp",
-      "visibility": "public"
-    },
-    "ArtLift": {
-      "path": "~/Projects/ArtLift",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/ArtLift",
-      "visibility": "public"
-    },
-    "ccplugin-backend-forge": {
-      "path": "~/Projects/ccplugin-backend-forge",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/ccplugin-backend-forge",
-      "visibility": "public"
-    },
-    "LudoMultiplayer": {
-      "path": "~/Projects/LudoMultiplayer",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/LudoMultiplayer",
-      "visibility": "public"
-    },
-    "claude-design-system": {
-      "path": "~/Projects/claude-design-system",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/claude-design-system",
-      "visibility": "public"
-    },
-    "ccplugin-3d-forge": {
-      "path": "~/Projects/ccplugin-3d-forge",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/ccplugin-3d-forge",
-      "visibility": "public"
-    },
-    "craft-unity": {
-      "path": "~/Projects/craft-unity",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/craft-unity",
-      "visibility": "public"
-    },
-    "ccplugin-unity-craft": {
-      "path": "~/Projects/ccplugin-unity-craft",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/ccplugin-unity-craft",
-      "visibility": "public"
-    },
-    "3d-asset-foundry": {
-      "path": "~/Projects/3d-asset-foundry",
-      "category": "user-project",
-      "role": "product",
-      "depends_on": [],
-      "dependents": [],
-      "sync_triggers": [],
-      "workspace_link": "workspaces/3d-asset-foundry",
-      "visibility": "public"
-    }
+  {
+    "name": "ApApp Unity",
+    "path": "/Users/musabkara/Projects/ApApp Unity",
+    "jira": null,
+    "git": "Rabia94/ApApp",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ApApp-CrossPlatform",
+    "path": "/Users/musabkara/Projects/ApApp-CrossPlatform",
+    "jira": null,
+    "git": "SkyWalker2506/ApApp-CrossPlatform",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ArtLift",
+    "path": "/Users/musabkara/Projects/ArtLift",
+    "jira": null,
+    "git": "SkyWalker2506/ArtLift",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ByteCraftHQ",
+    "path": "/Users/musabkara/Projects/ByteCraftHQ",
+    "jira": null,
+    "git": "SkyWalker2506/bytecraft-hq",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "Projects",
+    "path": "/Users/musabkara/Projects",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "CoinHQ",
+    "path": "/Users/musabkara/Projects/CoinHQ",
+    "jira": null,
+    "git": "SkyWalker2506/CoinHQ",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "CrimsonArena",
+    "path": "/Users/musabkara/Projects/CrimsonArena",
+    "jira": null,
+    "git": "SkyWalker2506/CrimsonArena",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "Gardirop",
+    "path": "/Users/musabkara/Projects/Gardirop",
+    "jira": null,
+    "git": "SkyWalker2506/gardirop",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "GothicDeckBuilder",
+    "path": "/Users/musabkara/Projects/GothicDeckBuilder",
+    "jira": null,
+    "git": "SkyWalker2506/GothicDeckBuilder",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "KnightOnlineAI",
+    "path": "/Users/musabkara/Projects/KnightOnlineAI",
+    "jira": null,
+    "git": "SkyWalker2506/KnightOnlineAI",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "LudoMultiplayer",
+    "path": "/Users/musabkara/Projects/LudoMultiplayer",
+    "jira": null,
+    "git": "SkyWalker2506/ludo-multiplayer",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ProjeBirlik",
+    "path": "/Users/musabkara/Projects/ProjeBirlik",
+    "jira": null,
+    "git": "SkyWalker2506/projebirlik",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "RefinUp",
+    "path": "/Users/musabkara/Projects/RefinUp",
+    "jira": null,
+    "git": "SkyWalker2506/RefinUp",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "Viralyze",
+    "path": "/Users/musabkara/Projects/Viralyze",
+    "jira": null,
+    "git": "SkyWalker2506/Viralyze",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "VocabLearningApp",
+    "path": "/Users/musabkara/Projects/VocabLearningApp",
+    "jira": null,
+    "git": "SkyWalker2506/vocab-learning-app",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ar-research",
+    "path": "/Users/musabkara/Projects/ar-research",
+    "jira": null,
+    "git": "SkyWalker2506/ar-research",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "bootstrapper",
+    "path": "/Users/musabkara/Projects/bootstrapper",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "bytecraft-portfolio",
+    "path": "/Users/musabkara/Projects/bytecraft-portfolio",
+    "jira": null,
+    "git": "SkyWalker2506/bytecraft-portfolio",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-3d-forge",
+    "path": "/Users/musabkara/Projects/ccplugin-3d-forge",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-3d-forge",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-agent-browser",
+    "path": "/Users/musabkara/Projects/ccplugin-agent-browser",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-agent-browser",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-ai-review",
+    "path": "/Users/musabkara/Projects/ccplugin-ai-review",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-ai-review",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-autonomous-ops",
+    "path": "/Users/musabkara/Projects/ccplugin-autonomous-ops",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-autonomous-ops",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-backend-forge",
+    "path": "/Users/musabkara/Projects/ccplugin-backend-forge",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-backend-forge",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-clipboard",
+    "path": "/Users/musabkara/Projects/ccplugin-clipboard",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-clipboard",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-code-quality",
+    "path": "/Users/musabkara/Projects/ccplugin-code-quality",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-code-quality",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-daily-check",
+    "path": "/Users/musabkara/Projects/ccplugin-daily-check",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-daily-check",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-devtools-setup",
+    "path": "/Users/musabkara/Projects/ccplugin-devtools-setup",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-devtools-setup",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-flutter-firebase",
+    "path": "/Users/musabkara/Projects/ccplugin-flutter-firebase",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-flutter-firebase",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-frontend-craft",
+    "path": "/Users/musabkara/Projects/ccplugin-frontend-craft",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-frontend-craft",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-git-github",
+    "path": "/Users/musabkara/Projects/ccplugin-git-github",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-git-github",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-improve",
+    "path": "/Users/musabkara/Projects/ccplugin-improve",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-improve",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-jira-suite",
+    "path": "/Users/musabkara/Projects/ccplugin-jira-suite",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-jira-suite",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-notifications",
+    "path": "/Users/musabkara/Projects/ccplugin-notifications",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-notifications",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-opencode-bridge",
+    "path": "/Users/musabkara/Projects/ccplugin-opencode-bridge",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-opencode-bridge",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-research-tools",
+    "path": "/Users/musabkara/Projects/ccplugin-research-tools",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-research-tools",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-sprint-planner",
+    "path": "/Users/musabkara/Projects/ccplugin-sprint-planner",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-sprint-planner",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-sync-agents",
+    "path": "/Users/musabkara/Projects/ccplugin-sync-agents",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-sync-agents",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-telegram",
+    "path": "/Users/musabkara/Projects/ccplugin-telegram",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-telegram",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-unity-craft",
+    "path": "/Users/musabkara/Projects/ccplugin-unity-craft",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-unity-craft",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "ccplugin-voice-input",
+    "path": "/Users/musabkara/Projects/ccplugin-voice-input",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-voice-input",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "claude-agent-catalog",
+    "path": "/Users/musabkara/Projects/claude-agent-catalog",
+    "jira": null,
+    "git": "SkyWalker2506/claude-agent-catalog",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "claude-config",
+    "path": "/Users/musabkara/Projects/claude-config",
+    "jira": null,
+    "git": "SkyWalker2506/claude-config",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "claude-design-system",
+    "path": "/Users/musabkara/Projects/claude-design-system",
+    "jira": null,
+    "git": "SkyWalker2506/claude-design-system",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "claude-marketplace",
+    "path": "/Users/musabkara/Projects/claude-marketplace",
+    "jira": null,
+    "git": "SkyWalker2506/claude-marketplace",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "claude-plugins",
+    "path": "/Users/musabkara/Projects/claude-plugins",
+    "jira": null,
+    "git": "SkyWalker2506/claude-marketplace",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "craft-unity",
+    "path": "/Users/musabkara/Projects/craft-unity",
+    "jira": null,
+    "git": "SkyWalker2506/craft-unity",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "demo-site",
+    "path": "/Users/musabkara/Projects/demo-site",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "docs",
+    "path": "/Users/musabkara/Projects/docs",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "feedback_tester",
+    "path": "/Users/musabkara/Projects/feedback_tester",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "flutter_feedback_kit",
+    "path": "/Users/musabkara/Projects/flutter_feedback_kit",
+    "jira": null,
+    "git": "SkyWalker2506/flutter_feedback_kit",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "football-ai-platform",
+    "path": "/Users/musabkara/Projects/football-ai-platform",
+    "jira": null,
+    "git": "BlackMountainsStudio/tartismalipozisyonlar",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "golf-paper-craft",
+    "path": "/Users/musabkara/Projects/golf-paper-craft",
+    "jira": null,
+    "git": "SkyWalker2506/golf-paper-craft",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "nakkas",
+    "path": "/Users/musabkara/Projects/nakkas",
+    "jira": null,
+    "git": "SkyWalker2506/nakkas",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "trading-bot",
+    "path": "/Users/musabkara/Projects/trading-bot",
+    "jira": null,
+    "git": "SkyWalker2506/trading-bot",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
+  },
+  {
+    "name": "transcriptr",
+    "path": "/Users/musabkara/Projects/transcriptr",
+    "jira": null,
+    "git": "SkyWalker2506/transcriptr",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-21"
   }
-}
+]

@@ -1,0 +1,18 @@
+{
+  "project": "GothicDeckBuilder",
+  "sprint": 1,
+  "goal": "",
+  "status": "planning",
+  "startDate": "2026-04-19",
+  "endDate": "",
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "",
+      "status": "todo",
+      "description": "",
+      "branch": "",
+      "assignedPrompt": "advance"
+    }
+  ]
+}
