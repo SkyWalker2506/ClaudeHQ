@@ -1,0 +1,54 @@
+{
+  "project": "MultiMind-Kids-Brain-Games-CrossPlatform",
+  "sprint": 3,
+  "goal": "Ship remaining 36 mini games from ROADMAP §5 Groups A-H as lean V1s behind a central GAME_REGISTRY. Every game extends the 10-move rule via _shared/useMiniGame + miniGameStep. typecheck/tests/build green.",
+  "status": "done",
+  "startDate": "2026-04-23",
+  "endDate": "2026-04-23",
+  "scope": {
+    "ownedPaths": [
+      "src/games/** (except 5 pilots + _base)",
+      "src/app/GameRouter.tsx (new)",
+      "src/App.tsx (router slim)",
+      "src/i18n/locales/**/common.json (games namespace)",
+      "scripts/generate-games.mjs"
+    ],
+    "notOwned": [
+      "src/ui/**",
+      "src/components/**",
+      "src/games/_base/**",
+      "src/games/SimpleMathAddition, MemoryFlash, ShapeMatching, ShadowMatch, ColorMatchingPuzzle"
+    ]
+  },
+  "shippedGames": [
+    {"group": "A-DragDrop", "keys": ["CompleteThePicture","ImageEditing","HabitatHero","CleanYourRoom"], "kind": "choice (drag polish deferred)"},
+    {"group": "B-Math", "keys": ["DiceSum","MoneyBank","CashierMiniGame","CountTheSugarV1"], "kind": "choice"},
+    {"group": "C-Memory", "keys": ["PictureMatching","PatternCopyGame","RhythmRepeat"], "kind": "pairs + sequence"},
+    {"group": "D-Language", "keys": ["WordBuilder","AnimalWordBuilder","LetterMachine","SyllableSnap","FindTheSameLetter"], "kind": "choice"},
+    {"group": "E-Visual", "keys": ["OddOneOut","ComplexShape","ComparingBeeSize"], "kind": "choice"},
+    {"group": "F-Emotion", "keys": ["EmotionDetective1","EmotionDetective2","EmotionDetective3"], "kind": "choice"},
+    {"group": "G-Puzzle", "keys": ["ChocolatePuzzle","BallSort","WheelOfFortune"], "kind": "choice + custom wheel"},
+    {"group": "H-Match3", "keys": ["Match3Puzzle"], "kind": "custom 5x5 swap-and-match"},
+    {"group": "Fill", "keys": ["GreenWorld","CountTheSugarV2","CountTheSugarV3","ComparingFishSize","EmotionTestWithColors","PatternTag","CountThePotion","FindingImagesFromASeries","SequentialSelection","SimpleMathSubtraction"], "kind": "choice + Phaser GreenWorld + custom SequentialSelection"}
+  ],
+  "totals": {"gamesShipped": 36, "testFiles": 39, "tests": 78, "buildJsGzip": "519.72 kB"},
+  "tasks": [
+    {"id": "S3-T1", "title": "Shared primitives: useMiniGame, miniGameStep, ChoiceGame/SequenceGame/PairsGame, GameShell", "status": "done"},
+    {"id": "S3-T2", "title": "Group A drag-drop (4 games)", "status": "done", "commit": "4be9855"},
+    {"id": "S3-T3", "title": "Group B math (4 games)", "status": "done", "commit": "d6a0e08"},
+    {"id": "S3-T4", "title": "Group C memory (3 games)", "status": "done", "commit": "4dfa4f6"},
+    {"id": "S3-T5", "title": "Group D language (5 games)", "status": "done", "commit": "d0aa484"},
+    {"id": "S3-T6", "title": "Group E visual (3 games)", "status": "done", "commit": "428e6c2"},
+    {"id": "S3-T7", "title": "Group F emotion (3 games)", "status": "done", "commit": "472cfc3"},
+    {"id": "S3-T8", "title": "Group G puzzle (3 games)", "status": "done", "commit": "027d660"},
+    {"id": "S3-T9", "title": "Group H Match3Puzzle", "status": "done", "commit": "50e9692"},
+    {"id": "S3-T10", "title": "GreenWorld (Phaser Arcade) + fills + central GAME_REGISTRY", "status": "done", "commit": "07ab986"}
+  ],
+  "followups": [
+    "Wire GAME_REGISTRY into GameMap READY_GAMES (owned by sibling agent)",
+    "Replace emoji placeholders with Unity sprite assets (per-game pipeline pass)",
+    "Convert Group A from choice to true drag-drop (Phaser or HTML5 DnD) in Sprint 4",
+    "Localize prompts (currently English literal fallback) beyond game titles",
+    "Code-split: dist bundle 1.9MB pre-gzip; dynamic import Phaser"
+  ]
+}

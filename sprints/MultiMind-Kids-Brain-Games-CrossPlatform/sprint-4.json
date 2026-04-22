@@ -1,0 +1,72 @@
+{
+  "project": "MultiMind-Kids-Brain-Games-CrossPlatform",
+  "sprint": 4,
+  "goal": "Economy, monetization, parental gate, polish, performance, PWA hardening.",
+  "status": "done",
+  "startDate": "2026-04-23",
+  "endDate": "2026-04-23",
+  "tasks": [
+    {
+      "id": "S4-T1",
+      "title": "LevelManager + progressStore (stars, unlocks, coins, RTDB write-through)",
+      "status": "done",
+      "commit": "1cdf7c4"
+    },
+    {
+      "id": "S4-T2",
+      "title": "Coin economy + WheelOfFortune spin/cost/reward",
+      "status": "done",
+      "commit": "eaf1717"
+    },
+    {
+      "id": "S4-T3",
+      "title": "ParentalGate modal (arithmetic challenge + dismiss)",
+      "status": "done",
+      "commit": "8cdfe2a"
+    },
+    {
+      "id": "S4-T4",
+      "title": "Stripe Checkout stub + PremiumGate UI",
+      "status": "done",
+      "commit": "eee262e",
+      "note": "@stripe/stripe-js dep not installed; endpoint returns 501 until backend is wired."
+    },
+    {
+      "id": "S4-T5",
+      "title": "Settings screen (profile / audio / language / premium / account)",
+      "status": "done",
+      "commit": "bb5b9c5"
+    },
+    {
+      "id": "S4-T6",
+      "title": "Background music + fade on route change",
+      "status": "done",
+      "commit": "e391e03"
+    },
+    {
+      "id": "S4-T7",
+      "title": "Bundle split: Phaser + per-game React.lazy chunks",
+      "status": "done",
+      "commit": "3c05d06",
+      "bundleBefore": { "indexJsGzipKB": 520.79, "phaserInIndex": true },
+      "bundleAfter": { "indexJsGzipKB": 18.28, "phaserChunkGzipKB": 351.67, "perGameMaxGzipKB": 2.85 }
+    },
+    {
+      "id": "S4-T8",
+      "title": "PWA: offline-first service worker + install prompt",
+      "status": "done",
+      "commit": "0d988f7",
+      "note": "sharp not installed; webp icons re-used for 192/512 sizes."
+    },
+    {
+      "id": "S4-T9",
+      "title": "Sprint bookkeeping: close sprint-3, open sprint-4",
+      "status": "done"
+    }
+  ],
+  "totals": {
+    "tests": 89,
+    "initialJsGzipKB": 18.28,
+    "phaserChunkGzipKB": 351.67
+  }
+}
