@@ -1,0 +1,121 @@
+{
+  "project": "MultiMind-Kids-Brain-Games-CrossPlatform",
+  "sprint": 1,
+  "goal": "FAZ 0 + FAZ 1: Asset pipeline + Vite/React/TS iskelet \u2014 bo\u015f ama deploy edilebilir uygulama",
+  "status": "in_progress",
+  "startDate": "2026-04-23",
+  "endDate": "",
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Asset envanteri + sprite/audio listele",
+      "status": "done",
+      "description": "Unity projesinden Assets/ExtraPackage/{Sprites,Audio} alt\u0131ndaki t\u00fcm dosyalar\u0131 say, oyun baz\u0131nda grupla, asset-inventory.json \u00fcret",
+      "branch": "feat/asset-inventory",
+      "agent": "unity-asset-workflow",
+      "assignedPrompt": "advance"
+    },
+    {
+      "id": "T2",
+      "title": "Sprite WebP + atlas pipeline scripti",
+      "status": "done",
+      "description": "scripts/asset-pipeline/sprites.ts \u2014 PNG\u2192WebP (cwebp -q 80), TexturePacker CLI ile oyun bazl\u0131 atlas + JSON descriptor",
+      "branch": "feat/sprite-pipeline",
+      "agent": "scripting-agent",
+      "depends": [
+        "T1"
+      ],
+      "assignedPrompt": "advance"
+    },
+    {
+      "id": "T3",
+      "title": "Audio OGG+MP3 pipeline scripti",
+      "status": "done",
+      "description": "scripts/asset-pipeline/audio.ts \u2014 ffmpeg ile WAV/MP3\u2192OGG+MP3 \u00e7ift format",
+      "branch": "feat/audio-pipeline",
+      "agent": "scripting-agent",
+      "depends": [
+        "T1"
+      ],
+      "assignedPrompt": "advance"
+    },
+    {
+      "id": "T4",
+      "title": "ScriptableObject \u2192 game-database.json \u00e7evirici",
+      "status": "done",
+      "description": "Unity .asset (YAML) parser \u2192 src/data/games/game-database.json (id, name, intelligences, hashtags)",
+      "branch": "feat/game-database",
+      "agent": "unity-developer",
+      "depends": [
+        "T1"
+      ],
+      "assignedPrompt": "advance"
+    },
+    {
+      "id": "T5",
+      "title": "Vite + React + TS + Tailwind iskelet",
+      "status": "done",
+      "description": "npm create vite@latest .; phaser zustand gsap react-i18next firebase howler tailwindcss kurulumu; eslint+prettier+vitest config",
+      "branch": "feat/vite-skeleton",
+      "agent": "full-stack-web",
+      "assignedPrompt": "advance"
+    },
+    {
+      "id": "T6",
+      "title": "Klas\u00f6r mimarisi + IMiniGame interface + MiniGameBase",
+      "status": "done",
+      "description": "ROADMAP \u00a71.2-1.4 \u2014 src/{core,data,firebase,games/_base,components,store} + types.ts + MiniGameBase abstract class (10-move kural\u0131)",
+      "branch": "feat/core-architecture",
+      "agent": "backend-architect",
+      "depends": [
+        "T5"
+      ],
+      "assignedPrompt": "advance"
+    },
+    {
+      "id": "T7",
+      "title": "Firebase config + Auth servisleri (TS)",
+      "status": "done",
+      "description": "google-services.json oku \u2192 firebase/config.ts; Google/Email/Anonymous sign-in fonksiyonlar\u0131; auth state subscription",
+      "branch": "feat/firebase-auth",
+      "agent": "firebase-agent",
+      "depends": [
+        "T5"
+      ],
+      "assignedPrompt": "advance"
+    },
+    {
+      "id": "T8",
+      "title": "Capacitor + Tauri kurulum (skeleton)",
+      "status": "todo",
+      "description": "capacitor add android ios + tauri init \u2014 bo\u015f web app build \u2192 APK + macOS/Win/Linux executable \u00e7\u0131kabilmeli",
+      "branch": "feat/cross-platform-shells",
+      "agent": "mobile-dev-agent",
+      "depends": [
+        "T5"
+      ],
+      "assignedPrompt": "advance"
+    },
+    {
+      "id": "T9",
+      "title": "GitHub repo + Actions CI (lint+test+build)",
+      "status": "done",
+      "description": "SkyWalker2506/MultiMind-Kids-Brain-Games-CrossPlatform; .github/workflows/ci.yml; main branch protection",
+      "branch": "feat/ci",
+      "agent": "github-manager",
+      "depends": [
+        "T5"
+      ],
+      "assignedPrompt": "advance"
+    },
+    {
+      "id": "T10",
+      "title": "Jira projesi MMKG a\u00e7 + ROADMAP fazlar\u0131n\u0131 epic olarak gir",
+      "status": "blocked",
+      "description": "Jira MMKG projesi; FAZ 0-10 epic olarak; sprint-1 task'lar\u0131n\u0131 story olarak link",
+      "branch": "",
+      "agent": "jira-pm",
+      "assignedPrompt": "advance"
+    }
+  ]
+}

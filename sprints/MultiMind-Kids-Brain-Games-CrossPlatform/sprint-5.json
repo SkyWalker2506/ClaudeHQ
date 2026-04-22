@@ -1,0 +1,65 @@
+{
+  "project": "MultiMind-Kids-Brain-Games-CrossPlatform",
+  "sprint": 5,
+  "goal": "FAZ 10 — Cross-platform release prep: Android signing, iOS TestFlight scaffolding, Tauri matrix, Firebase Hosting deploy pipeline, PWA install UX, release metadata.",
+  "status": "done",
+  "startDate": "2026-04-23",
+  "endDate": "2026-04-23",
+  "tasks": [
+    {
+      "id": "S5-T1",
+      "title": "Android release build configuration + signing docs",
+      "status": "done",
+      "note": "assembleRelease skipped locally — JDK runtime not available on this host. Config and docs ship; CI will exercise the signed build once keystore secrets are provided."
+    },
+    {
+      "id": "S5-T2",
+      "title": "iOS release scaffolding (landscape-only, privacy strings, TestFlight guide)",
+      "status": "done",
+      "note": "xcodebuild archive skipped — no distribution certificate on host."
+    },
+    {
+      "id": "S5-T3",
+      "title": "Tauri desktop config + release matrix (macOS / Windows / Linux)",
+      "status": "done",
+      "note": "Local tauri:build skipped — cargo/rust toolchain missing. GitHub Actions matrix handles all three targets."
+    },
+    {
+      "id": "S5-T4",
+      "title": "Firebase Hosting deploy workflow + cache/rewrite headers",
+      "status": "done"
+    },
+    {
+      "id": "S5-T5",
+      "title": "PWA install banner with 14-day dismiss memory",
+      "status": "done"
+    },
+    {
+      "id": "S5-T6",
+      "title": "Release metadata: version 0.5.0 + CHANGELOG",
+      "status": "done"
+    },
+    {
+      "id": "S5-T7",
+      "title": "README badges, Unity reference screenshots, deploy links",
+      "status": "done"
+    },
+    {
+      "id": "S5-T8",
+      "title": "Sprint bookkeeping: close sprint-4, open sprint-5",
+      "status": "done"
+    }
+  ],
+  "totals": {
+    "tests": 89,
+    "initialJsGzipKB": 18.28,
+    "phaserChunkGzipKB": 351.67
+  },
+  "followUps": [
+    "Unity-parity iteration loop: systematic side-by-side parity pass against the original Unity build (gameplay feel, copy, audio timing, score balance). Track in sprint-6 as the headline goal once sprint-5 artifacts ship to live.",
+    "Privacy policy + ToS pages (carried forward from the original Sprint 5 backlog).",
+    "Firebase RTDB security rules hardening + Firestore indexes.",
+    "Production .env + secrets rotation SOP.",
+    "Pre-launch QA: Playwright smoke tests over all 41 games."
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "project": "MultiMind-Kids-Brain-Games-CrossPlatform",
+  "sprint": 2,
+  "goal": "FAZ 2 (Firebase RTDB CRUD) + FAZ 3 (GameMap + MiniGameUI) + FAZ 4 pilot oyun #1 SimpleMathAddition tamamlandı; sonraki: pilot oyunlar 2-5 (Phaser entegrasyonu)",
+  "status": "done",
+  "startDate": "2026-04-23",
+  "endDate": "2026-04-23",
+  "tasks": [
+    {"id": "S2-T1", "title": "React + Phaser köprüsü (PhaserGameContainer)", "status": "done", "agent": "web-game-dev"},
+    {"id": "S2-T2", "title": "Pilot #2 — MemoryFlash (Phaser)", "status": "done", "agent": "web-game-dev"},
+    {"id": "S2-T3", "title": "Pilot #3 — ShapeMatching (Phaser DragDrop)", "status": "done", "agent": "web-game-dev"},
+    {"id": "S2-T4", "title": "Pilot #4 — ShadowMatch", "status": "done", "agent": "web-game-dev"},
+    {"id": "S2-T5", "title": "Pilot #5 — ColorMatchingPuzzle", "status": "done", "agent": "web-game-dev"},
+    {"id": "S2-T6", "title": "i18n init — 7 dil bootstrap", "status": "done", "agent": "unity-localization"},
+    {"id": "S2-T7", "title": "MiniGameEnded sonuç ekranı", "status": "done", "agent": "frontend-coder"},
+    {"id": "S2-T8", "title": "Auth UI — Login/Signup/Anon ekranları", "status": "done", "agent": "frontend-coder"},
+    {"id": "S2-T9", "title": "Firebase Hosting deploy + PWA manifest", "status": "done", "agent": "cloud-deploy-agent"},
+    {"id": "S2-T10", "title": "APK build pipeline doğrulama", "status": "done", "agent": "mobile-dev-agent"}
+  ]
+}
