@@ -51,6 +51,8 @@ ${BOLD}Commands:${NC}
   plugin list                       List all plugins with category and install status
   agent list [category]             List all agents with ID, name, category and active/pool status
   graph <subcommand>                Knowledge-graph utilities (install/build/status/docs/view)
+  history <search|recent|stats>     Search/inspect Claude Code session transcripts
+  hive <log|query|stats>            Shared cross-agent task log (hive mind)
 
 ${BOLD}Options:${NC}
   --dry-run                   Show what would happen without executing
@@ -2274,6 +2276,287 @@ PYEOF
     echo ""
 }
 
+# --- HISTORY ---
+# Search / list / stats over Claude Code session transcripts
+# (~/.claude/projects/*/*.jsonl). Read-only.
+CLAUDE_SESSIONS_DIR="${CLAUDE_SESSIONS_DIR:-$HOME/.claude/projects}"
+
+_history_require_rg() {
+    if ! command -v rg >/dev/null 2>&1; then
+        echo -e "${RED}Error:${NC} ripgrep (rg) not installed." >&2
+        exit 1
+    fi
+}
+
+_history_project_from_path() {
+    # ~/.claude/projects/-Users-musabkara-Projects-Foo/xxx.jsonl -> Foo
+    local f="$1"
+    local dir
+    dir="$(basename "$(dirname "$f")")"
+    # strip leading dash, take last segment after last '-'
+    echo "${dir##*-}"
+}
+
+cmd_history() {
+    local sub="${1:-}"
+    shift || true
+
+    if [[ ! -d "$CLAUDE_SESSIONS_DIR" ]]; then
+        echo -e "${YELLOW}No Claude sessions dir found at $CLAUDE_SESSIONS_DIR${NC}"
+        exit 0
+    fi
+
+    case "$sub" in
+        search)  history_search "$@" ;;
+        recent)  history_recent "$@" ;;
+        stats)   history_stats "$@" ;;
+        *)
+            echo -e "${RED}Usage:${NC} hq history <search|recent|stats> [args]"
+            echo "  hq history search <query> [--all]"
+            echo "  hq history recent [N]"
+            echo "  hq history stats"
+            exit 1
+            ;;
+    esac
+}
+
+history_search() {
+    _history_require_rg
+    local query=""
+    local all=false
+    for arg in "$@"; do
+        case "$arg" in
+            --all) all=true ;;
+            -*)    echo -e "${RED}Unknown flag:${NC} $arg"; exit 1 ;;
+            *)     query="$arg" ;;
+        esac
+    done
+    if [[ -z "$query" ]]; then
+        echo -e "${RED}Usage:${NC} hq history search <query> [--all]"
+        exit 1
+    fi
+
+    local find_args=( "$CLAUDE_SESSIONS_DIR" -type f -name "*.jsonl" )
+    if [[ "$all" != "true" ]]; then
+        find_args+=( -mtime -30 )
+    fi
+
+    local hits=0
+    while IFS= read -r f; do
+        [[ -z "$f" ]] && continue
+        local project
+        project="$(_history_project_from_path "$f")"
+        # Get matching lines
+        while IFS= read -r line; do
+            local ts snippet
+            if command -v jq >/dev/null 2>&1; then
+                ts=$(echo "$line" | jq -r '.timestamp // ""' 2>/dev/null || echo "")
+                snippet=$(echo "$line" | jq -r '
+                    (.message.content // .content // .text // "") as $c
+                    | (if ($c|type)=="array" then ($c | map(.text // "") | join(" ")) else ($c|tostring) end)
+                    | gsub("\\s+"; " ")
+                    | .[0:160]
+                ' 2>/dev/null || echo "")
+            else
+                ts=""
+                snippet="${line:0:160}"
+            fi
+            printf "${GRAY}%-19s${NC} ${BOLD}%-22s${NC} %s\n" "${ts:0:19}" "$project" "$snippet"
+            hits=$((hits + 1))
+        done < <(rg --no-heading --no-line-number -F "$query" "$f" 2>/dev/null || true)
+    done < <(find "${find_args[@]}" 2>/dev/null)
+
+    echo ""
+    echo -e "${BOLD}Matches:${NC} $hits"
+}
+
+history_recent() {
+    local n="${1:-10}"
+    local files
+    # Sort by mtime desc
+    files=$(find "$CLAUDE_SESSIONS_DIR" -type f -name "*.jsonl" -print0 2>/dev/null \
+            | xargs -0 stat -f "%m %N" 2>/dev/null \
+            | sort -rn | head -n "$n")
+
+    if [[ -z "$files" ]]; then
+        echo -e "${YELLOW}No sessions found.${NC}"
+        return 0
+    fi
+
+    printf "${BOLD}%-19s %-22s %s${NC}\n" "LAST UPDATE" "PROJECT" "FIRST USER MESSAGE"
+    printf "%-19s %-22s %s\n" "-----------" "-------" "------------------"
+
+    while IFS= read -r row; do
+        [[ -z "$row" ]] && continue
+        local mtime f
+        mtime="${row%% *}"
+        f="${row#* }"
+        local project ts_str first_msg
+        project="$(_history_project_from_path "$f")"
+        ts_str=$(date -r "$mtime" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "-")
+
+        if command -v jq >/dev/null 2>&1; then
+            first_msg=$(jq -r '
+                select((.type // .role // "") == "user") |
+                (.message.content // .content // .text // "") as $c |
+                (if ($c|type)=="array" then ($c | map(.text // "") | join(" ")) else ($c|tostring) end)
+            ' "$f" 2>/dev/null | head -n 1 | tr -d '\n' | cut -c 1-80)
+        else
+            first_msg=$(head -n 1 "$f" 2>/dev/null | cut -c 1-80)
+        fi
+
+        printf "%-19s %-22s %s\n" "$ts_str" "$project" "${first_msg:--}"
+    done <<< "$files"
+}
+
+history_stats() {
+    if ! command -v jq >/dev/null 2>&1; then
+        echo -e "${YELLOW}jq not installed — token stats unavailable.${NC}"
+        echo "File counts per project:"
+        find "$CLAUDE_SESSIONS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while read -r d; do
+            local p n
+            p="$(basename "$d")"
+            p="${p##*-}"
+            n=$(find "$d" -name "*.jsonl" -type f 2>/dev/null | wc -l | tr -d ' ')
+            printf "  %-25s %s sessions\n" "$p" "$n"
+        done
+        return 0
+    fi
+
+    printf "${BOLD}%-25s %10s %10s %10s${NC}\n" "PROJECT" "SESSIONS" "INPUT_TOK" "OUTPUT_TOK"
+    printf "%-25s %10s %10s %10s\n" "-------" "--------" "---------" "----------"
+
+    find "$CLAUDE_SESSIONS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort | while read -r d; do
+        local project sessions stats
+        project="$(basename "$d")"
+        project="${project##*-}"
+        sessions=$(find "$d" -name "*.jsonl" -type f 2>/dev/null | wc -l | tr -d ' ')
+        [[ "$sessions" == "0" ]] && continue
+
+        stats=$(find "$d" -name "*.jsonl" -type f -print0 2>/dev/null \
+            | xargs -0 cat 2>/dev/null \
+            | jq -s -r '
+                [ .[] | (.message.usage // .usage // {}) ] as $u
+                | {
+                    in:  ([ $u[] | (.input_tokens // 0) ] | add // 0),
+                    out: ([ $u[] | (.output_tokens // 0) ] | add // 0)
+                  }
+                | "\(.in)\t\(.out)"
+            ' 2>/dev/null || echo "0	0")
+
+        local in_tok out_tok
+        in_tok="${stats%%$'\t'*}"
+        out_tok="${stats##*$'\t'}"
+        printf "%-25s %10s %10s %10s\n" "$project" "$sessions" "${in_tok:-0}" "${out_tok:-0}"
+    done
+    echo ""
+}
+
+# --- HIVE ---
+HIVE_DIR="${HIVE_DIR:-$HOME/.claude/hive}"
+HIVE_LOG="$HIVE_DIR/tasks.jsonl"
+
+cmd_hive() {
+    local sub="${1:-}"
+    shift || true
+
+    case "$sub" in
+        log)    hive_log "$@" ;;
+        query)  hive_query "$@" ;;
+        stats)  hive_stats "$@" ;;
+        *)
+            echo -e "${RED}Usage:${NC} hq hive <log|query|stats> [args]"
+            echo "  hq hive log              Last 20 task records"
+            echo "  hq hive query <agent>    Filter by agent"
+            echo "  hq hive stats            Per-agent count + success rate (7d)"
+            exit 1
+            ;;
+    esac
+}
+
+_hive_check_log() {
+    if [[ ! -f "$HIVE_LOG" ]]; then
+        echo -e "${YELLOW}Hive log empty${NC} ($HIVE_LOG)"
+        echo "Agents record outcomes via: global/scripts/hive-append.sh"
+        return 1
+    fi
+    return 0
+}
+
+hive_log() {
+    _hive_check_log || return 0
+    printf "${BOLD}%-20s %-18s %-8s %s${NC}\n" "TIMESTAMP" "AGENT" "STATUS" "SUMMARY"
+    printf "%-20s %-18s %-8s %s\n" "---------" "-----" "------" "-------"
+    if command -v jq >/dev/null 2>&1; then
+        tail -n 20 "$HIVE_LOG" | jq -r '"\(.ts[0:19])\t\(.agent)\t\(.status)\t\(.summary)"' 2>/dev/null \
+            | while IFS=$'\t' read -r ts agent status summary; do
+                local c="$GRAY"
+                case "$status" in
+                    done)    c="$GREEN" ;;
+                    failed)  c="$RED" ;;
+                    started) c="$YELLOW" ;;
+                esac
+                printf "%-20s %-18s ${c}%-8s${NC} %s\n" "$ts" "$agent" "$status" "$summary"
+            done
+    else
+        tail -n 20 "$HIVE_LOG"
+    fi
+}
+
+hive_query() {
+    local agent="${1:-}"
+    if [[ -z "$agent" ]]; then
+        echo -e "${RED}Usage:${NC} hq hive query <agent>"
+        exit 1
+    fi
+    _hive_check_log || return 0
+    if command -v jq >/dev/null 2>&1; then
+        printf "${BOLD}%-20s %-8s %s${NC}\n" "TIMESTAMP" "STATUS" "SUMMARY"
+        jq -r --arg a "$agent" 'select(.agent==$a) | "\(.ts[0:19])\t\(.status)\t\(.summary)"' "$HIVE_LOG" \
+            | while IFS=$'\t' read -r ts status summary; do
+                printf "%-20s %-8s %s\n" "$ts" "$status" "$summary"
+            done
+    else
+        grep -F "\"agent\":\"$agent\"" "$HIVE_LOG" || true
+    fi
+}
+
+hive_stats() {
+    _hive_check_log || return 0
+    if ! command -v jq >/dev/null 2>&1; then
+        echo -e "${YELLOW}jq not installed — stats unavailable.${NC}"
+        return 0
+    fi
+
+    local cutoff
+    cutoff=$(date -u -v-7d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+             || date -u -d "7 days ago" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+             || echo "1970-01-01T00:00:00Z")
+
+    printf "${BOLD}%-18s %10s %10s %10s %10s${NC}\n" "AGENT" "TOTAL" "DONE" "FAILED" "SUCCESS%"
+    printf "%-18s %10s %10s %10s %10s\n" "-----" "-----" "----" "------" "--------"
+
+    jq -r --arg cutoff "$cutoff" '
+        select(.ts >= $cutoff) | .agent
+    ' "$HIVE_LOG" | sort -u | while read -r agent; do
+        [[ -z "$agent" ]] && continue
+        local total done_c failed_c
+        total=$(jq -r --arg c "$cutoff" --arg a "$agent" \
+            'select(.ts >= $c and .agent == $a) | .agent' "$HIVE_LOG" | wc -l | tr -d ' ')
+        done_c=$(jq -r --arg c "$cutoff" --arg a "$agent" \
+            'select(.ts >= $c and .agent == $a and .status == "done") | .agent' "$HIVE_LOG" | wc -l | tr -d ' ')
+        failed_c=$(jq -r --arg c "$cutoff" --arg a "$agent" \
+            'select(.ts >= $c and .agent == $a and .status == "failed") | .agent' "$HIVE_LOG" | wc -l | tr -d ' ')
+        local finished=$(( done_c + failed_c ))
+        local rate="-"
+        if (( finished > 0 )); then
+            rate=$(( done_c * 100 / finished ))%
+        fi
+        printf "%-18s %10s %10s %10s %10s\n" "$agent" "$total" "$done_c" "$failed_c" "$rate"
+    done
+    echo ""
+}
+
 # --- MAIN ---
 case "${1:-}" in
     scan)       shift; cmd_scan "$@" ;;
@@ -2307,6 +2590,8 @@ case "${1:-}" in
         esac
         ;;
     graph)      shift; exec bash "$HQ_DIR/scripts/hq-graph.sh" "$@" ;;
+    history)    shift; cmd_history "$@" ;;
+    hive)       shift; cmd_hive "$@" ;;
     --help|-h)  usage ;;
     *)          usage ;;
 esac
