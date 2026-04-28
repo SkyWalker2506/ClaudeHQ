@@ -6,7 +6,7 @@
     "git": "SkyWalker2506/3d-asset-foundry",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ApApp Unity",
@@ -15,7 +15,7 @@
     "git": "Rabia94/ApApp",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ApApp-CrossPlatform",
@@ -24,7 +24,7 @@
     "git": "SkyWalker2506/ApApp-CrossPlatform",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ArtLift",
@@ -33,7 +33,7 @@
     "git": "SkyWalker2506/ArtLift",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ByteCraftHQ",
@@ -42,7 +42,7 @@
     "git": "SkyWalker2506/bytecraft-hq",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "Projects",
@@ -51,7 +51,7 @@
     "git": null,
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "CoinHQ",
@@ -60,7 +60,7 @@
     "git": "SkyWalker2506/CoinHQ",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "CrimsonArena",
@@ -69,7 +69,16 @@
     "git": "SkyWalker2506/CrimsonArena",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
+  },
+  {
+    "name": "GameFactory",
+    "path": "/Users/musabkara/Projects/GameFactory",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "Gardirop",
@@ -78,7 +87,7 @@
     "git": "SkyWalker2506/gardirop",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "GothicDeckBuilder",
@@ -87,7 +96,7 @@
     "git": "SkyWalker2506/GothicDeckBuilder",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "KnightOnlineAI",
@@ -96,7 +105,7 @@
     "git": "SkyWalker2506/KnightOnlineAI",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "LudoMultiplayer",
@@ -105,7 +114,25 @@
     "git": "SkyWalker2506/ludo-multiplayer",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
+  },
+  {
+    "name": "MedievalFactory",
+    "path": "/Users/musabkara/Projects/MedievalFactory",
+    "jira": null,
+    "git": "SkyWalker2506/MedievalFactory",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-04-23"
+  },
+  {
+    "name": "MultiMind-Kids-Brain-Games-CrossPlatform",
+    "path": "/Users/musabkara/Projects/MultiMind-Kids-Brain-Games-CrossPlatform",
+    "jira": null,
+    "git": "SkyWalker2506/MultiMind-Kids-Brain-Games-CrossPlatform",
+    "active": true,
+    "currentSprint": 1,
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ProjeBirlik",
@@ -114,7 +141,7 @@
     "git": "SkyWalker2506/projebirlik",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "RefinUp",
@@ -123,7 +150,7 @@
     "git": "SkyWalker2506/RefinUp",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "Viralyze",
@@ -132,7 +159,7 @@
     "git": "SkyWalker2506/Viralyze",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "VocabLearningApp",
@@ -141,7 +168,7 @@
     "git": "SkyWalker2506/vocab-learning-app",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ar-research",
@@ -150,7 +177,7 @@
     "git": "SkyWalker2506/ar-research",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "bootstrapper",
@@ -159,7 +186,7 @@
     "git": null,
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "bytecraft-portfolio",
@@ -168,7 +195,7 @@
     "git": "SkyWalker2506/bytecraft-portfolio",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-3d-forge",
@@ -177,7 +204,7 @@
     "git": "SkyWalker2506/ccplugin-3d-forge",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-agent-browser",
@@ -186,7 +213,7 @@
     "git": "SkyWalker2506/ccplugin-agent-browser",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-ai-review",
@@ -195,7 +222,7 @@
     "git": "SkyWalker2506/ccplugin-ai-review",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-autonomous-ops",
@@ -204,7 +231,7 @@
     "git": "SkyWalker2506/ccplugin-autonomous-ops",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-backend-forge",
@@ -213,7 +240,7 @@
     "git": "SkyWalker2506/ccplugin-backend-forge",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-clipboard",
@@ -222,7 +249,7 @@
     "git": "SkyWalker2506/ccplugin-clipboard",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-code-quality",
@@ -231,7 +258,7 @@
     "git": "SkyWalker2506/ccplugin-code-quality",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-daily-check",
@@ -240,7 +267,7 @@
     "git": "SkyWalker2506/ccplugin-daily-check",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-devtools-setup",
@@ -249,7 +276,7 @@
     "git": "SkyWalker2506/ccplugin-devtools-setup",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-flutter-firebase",
@@ -258,7 +285,7 @@
     "git": "SkyWalker2506/ccplugin-flutter-firebase",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-frontend-craft",
@@ -267,7 +294,7 @@
     "git": "SkyWalker2506/ccplugin-frontend-craft",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-git-github",
@@ -276,7 +303,7 @@
     "git": "SkyWalker2506/ccplugin-git-github",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-improve",
@@ -285,7 +312,7 @@
     "git": "SkyWalker2506/ccplugin-improve",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-jira-suite",
@@ -294,7 +321,7 @@
     "git": "SkyWalker2506/ccplugin-jira-suite",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-notifications",
@@ -303,7 +330,7 @@
     "git": "SkyWalker2506/ccplugin-notifications",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-opencode-bridge",
@@ -312,7 +339,7 @@
     "git": "SkyWalker2506/ccplugin-opencode-bridge",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-research-tools",
@@ -321,7 +348,7 @@
     "git": "SkyWalker2506/ccplugin-research-tools",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-sprint-planner",
@@ -330,7 +357,7 @@
     "git": "SkyWalker2506/ccplugin-sprint-planner",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-sync-agents",
@@ -339,7 +366,7 @@
     "git": "SkyWalker2506/ccplugin-sync-agents",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-telegram",
@@ -348,7 +375,7 @@
     "git": "SkyWalker2506/ccplugin-telegram",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-unity-craft",
@@ -357,7 +384,7 @@
     "git": "SkyWalker2506/ccplugin-unity-craft",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "ccplugin-voice-input",
@@ -366,7 +393,7 @@
     "git": "SkyWalker2506/ccplugin-voice-input",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "claude-agent-catalog",
@@ -375,7 +402,7 @@
     "git": "SkyWalker2506/claude-agent-catalog",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "claude-config",
@@ -384,7 +411,7 @@
     "git": "SkyWalker2506/claude-config",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "claude-design-system",
@@ -393,7 +420,7 @@
     "git": "SkyWalker2506/claude-design-system",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "claude-marketplace",
@@ -402,7 +429,7 @@
     "git": "SkyWalker2506/claude-marketplace",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "claude-plugins",
@@ -411,7 +438,7 @@
     "git": "SkyWalker2506/claude-marketplace",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "craft-unity",
@@ -420,7 +447,7 @@
     "git": "SkyWalker2506/craft-unity",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "demo-site",
@@ -429,7 +456,7 @@
     "git": null,
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "docs",
@@ -438,7 +465,7 @@
     "git": null,
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "feedback_tester",
@@ -447,7 +474,7 @@
     "git": null,
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "flutter_feedback_kit",
@@ -456,7 +483,7 @@
     "git": "SkyWalker2506/flutter_feedback_kit",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "football-ai-platform",
@@ -465,7 +492,7 @@
     "git": "BlackMountainsStudio/tartismalipozisyonlar",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "golf-paper-craft",
@@ -474,7 +501,7 @@
     "git": "SkyWalker2506/golf-paper-craft",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "nakkas",
@@ -483,7 +510,7 @@
     "git": "SkyWalker2506/nakkas",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "trading-bot",
@@ -492,7 +519,7 @@
     "git": "SkyWalker2506/trading-bot",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   },
   {
     "name": "transcriptr",
@@ -501,6 +528,6 @@
     "git": "SkyWalker2506/transcriptr",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-04-21"
+    "discoveredAt": "2026-04-23"
   }
 ]
