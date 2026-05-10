@@ -35,3 +35,7 @@ mcp-servers/*/node_modules/
 
 # Generated files
 generated-images/
+
+# Local debug screenshots
+gdb-*.png
+gothic-deck-builder.png
