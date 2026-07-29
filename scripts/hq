@@ -144,13 +144,20 @@ cmd_scan() {
         projects=$(echo "$projects" | jq --argjson entry "$entry" '. + [$entry]')
         count=$((count + 1))
 
-        # Create workspace symlink for new project
+        # Create workspace symlink for new project.
+        # On Git Bash/MSYS without symlink privilege, `ln -s` silently falls back to a
+        # recursive COPY — pointing it at a project tree duplicates gigabytes. Skip there.
         local proj_path="$project_dir"
-        ln -sfn "$proj_path" "$HQ_DIR/workspaces/$(basename "$proj_path")"
+        case "$(uname -s)" in
+            MINGW*|MSYS*|CYGWIN*) : ;;
+            *) ln -sfn "$proj_path" "$HQ_DIR/workspaces/$(basename "$proj_path")" ;;
+        esac
 
         echo -e "  ${GREEN}+${NC} $project_name $([ -n "$jira_key" ] && echo "[${jira_key}]" || true) $([ -n "$git_remote" ] && echo "($git_remote)" || true)"
 
-    done < <(find "$PROJECTS_ROOT" -maxdepth 2 -name "CLAUDE.md" -not -path "*/node_modules/*" 2>/dev/null | sort)
+    # -mindepth 2: $PROJECTS_ROOT/CLAUDE.md is the router file, not a project.
+    # -L: ~/Projects may be a junction/symlink (Windows); plain find will not descend it.
+    done < <(find -L "$PROJECTS_ROOT" -mindepth 2 -maxdepth 2 -name "CLAUDE.md" -not -path "*/node_modules/*" 2>/dev/null | sort)
 
     # Write projects.json
     echo "$projects" | jq '.' > "$PROJECTS_FILE"
