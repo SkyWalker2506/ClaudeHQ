@@ -138,8 +138,15 @@ def main():
     print()
     run = report("KISIT maliyeti (ana kosu basina)", list(per_run.values()))
 
+    absent = sum(1 for value in per_dispatch if value == 0)
     print(f"\nkisitlarin brief icindeki payi: "
           f"%{100 * sum(per_dispatch) / sum(brief_totals):.1f}")
+    print(f"\nsyntactically_detected_constraint_absence_rate = "
+          f"%{100 * absent / len(per_dispatch):.1f}  ({absent}/{len(per_dispatch)})")
+    print("  IDDIA ETTIGI  : bu brief'lerde ACIK bir kisit ifadesi bulunamadi")
+    print("  IDDIA ETMEDIGI: bu dispatch'lerin korumasiz oldugu. Policy gerekip")
+    print("                  gerekmedigini bilmiyoruz — o, classifier ve task map ister.")
+    print("  Tespit REGEX tabanli: farkli ifade edilen bir kisiti kacirabilir.")
     print("\nGECIS SARTI — contract bunlari ASMAMALI:")
     print(f"  contract_token_cost_per_dispatch    p50 <= {dispatch['p50']:,.0f}   "
           f"p95 <= {dispatch['p95']:,.0f}")
