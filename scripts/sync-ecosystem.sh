@@ -60,11 +60,22 @@ replace_in() {
   local file="$1" pattern="$2" replacement="$3" label="$4"
   [[ -f "$file" ]] || { echo -e "  ${YELLOW}SKIP${NC} $(basename "$file") (not found)"; return 0; }
 
+  # Pick a delimiter that appears in neither pattern nor replacement.
+  # '#' alone is not safe: markdown tables carry '|', and tree diagrams carry '#'.
+  local delim=""
+  for d in '#' '|' '@' '%' '^' '~' '+'; do
+    if [[ "$pattern$replacement" != *"$d"* ]]; then delim="$d"; break; fi
+  done
+  if [[ -z "$delim" ]]; then
+    echo -e "  ${YELLOW}SKIP${NC} $label → no safe sed delimiter for this pattern"
+    return 0
+  fi
+
   if grep -qE "$pattern" "$file"; then
     if $DRY_RUN; then
       echo -e "  ${BLUE}[dry]${NC} $label → $(basename "$file")"
     else
-      sedi -E "s#${pattern}#${replacement}#g" "$file"
+      sedi -E "s${delim}${pattern}${delim}${replacement}${delim}g" "$file"
       echo -e "  ${GREEN}OK${NC} $label → $(basename "$file")"
       # Track unique files
       local already=false
@@ -117,6 +128,14 @@ replace_in "$R" \
   "[0-9]+ agents across [0-9]+ categories\. Each agent" \
   "${agent_count} agents across ${category_count} categories. Each agent" \
   "agents section"
+replace_in "$R" \
+  '\*\*[0-9]+ slash commands\*\*' \
+  "**${skill_count} slash commands**" \
+  "skill count (feature list)"
+replace_in "$R" \
+  "# [0-9]+ slash commands" \
+  "# ${skill_count} slash commands" \
+  "skill count (tree)"
 replace_in "$R" \
   "Plugin Marketplace.* — [0-9]+ plugins" \
   "Plugin Marketplace](https://github.com/SkyWalker2506/claude-marketplace) — $plugin_repo_count plugins" \

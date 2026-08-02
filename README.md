@@ -54,7 +54,7 @@ That's it. `install.sh` sets up CLAUDE.md redirectors, MCP servers, skills, and 
 
 ## Projects
 
-26 managed projects in the ecosystem:
+27 managed projects in the ecosystem:
 
 | Project | Category | Role | GitHub | Visibility |
 |---------|----------|------|--------|------------|
@@ -82,8 +82,22 @@ That's it. `install.sh` sets up CLAUDE.md redirectors, MCP servers, skills, and 
 | craft-unity | User Project | product | [SkyWalker2506/craft-unity](https://github.com/SkyWalker2506/craft-unity) | public |
 | ccplugin-unity-craft | User Project | product | [SkyWalker2506/ccplugin-unity-craft](https://github.com/SkyWalker2506/ccplugin-unity-craft) | public |
 | 3d-asset-foundry | User Project | product | [SkyWalker2506/3d-asset-foundry](https://github.com/SkyWalker2506/3d-asset-foundry) | public |
+| deckbuilder-toolkit | Unity Project | product | [SkyWalker2506/deckbuilder-toolkit](https://github.com/SkyWalker2506/deckbuilder-toolkit) | private |
 | claude-secrets | Private Knowledge | private-knowledge | — | private |
 | GptModels | Private Knowledge | private-knowledge | — | private |
+
+### Unity projects live outside `~/Projects`
+
+`hq scan` walks `~/Projects` only, so Unity projects under `~/Documents/Unity/` are invisible to
+it by default. Scan them with the documented root override instead of moving the project:
+
+```bash
+HQ_PROJECTS_ROOT=~/Documents/Unity ./scripts/hq scan
+```
+
+`deckbuilder-toolkit` is the first entry registered this way — its working tree is the Unity
+project at `~/Documents/Unity/DeckbuilderToolkit`, and the UPM package it produces
+(`com.bytecraft.deckbuilder-toolkit`) is embedded under that project's `Packages/`.
 
 ---
 
@@ -225,9 +239,9 @@ ClaudeHQ (you are here)
 
 | Repo | Description |
 |------|-------------|
-| [claude-config](https://github.com/SkyWalker2506/claude-config) | Multi-Agent OS — 203 agents, local-first routing, cost-aware orchestration |
+| [claude-config](https://github.com/SkyWalker2506/claude-config) | Multi-Agent OS — 211 agents, local-first routing, cost-aware orchestration |
 | [claude-marketplace](https://github.com/SkyWalker2506/claude-marketplace) | Claude Code Plugin Marketplace — 22 plugins, one-command install |
-| [claude-agent-catalog](https://github.com/SkyWalker2506/claude-agent-catalog) | Agent catalog — 203 agents across 15 categories |
+| [claude-agent-catalog](https://github.com/SkyWalker2506/claude-agent-catalog) | Agent catalog — 211 agents across 15 categories |
 | [sdk-market](https://github.com/SkyWalker2506/sdk-market) | SDK Market — production-ready kits for Flutter and beyond |
 
 ---
