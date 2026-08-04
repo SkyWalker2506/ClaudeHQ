@@ -3,6 +3,12 @@ progress/
 workspaces/
 features/
 
+# Scratch — .work/ is where in-flight experiments land. Keeping it untracked
+# on purpose: finished work moves to its own repo (hq new <name>), it does not
+# get committed in place.
+.work/
+.codex/
+
 # Claude Code
 .claude/settings.local.json
 .jira-state/
