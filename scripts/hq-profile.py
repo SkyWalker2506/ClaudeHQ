@@ -509,6 +509,15 @@ def print_report(r):
         ratio = bud["load_to_work"]
         flag = f"   {y}! 3:1 uzeri{n}" if ratio > 3 else ""
         print(f"  {'load:work orani':<32} {ratio:>6.2f} : 1{flag}")
+        # The ratio is confounded by session length: the preamble is a fixed
+        # cost, so a project of two-minute sessions looks bloated even with a
+        # tiny config. Say so instead of letting the number be misread.
+        per_session = bud["work"] // r["sessions"] if r["sessions"] else 0
+        if per_session < 5000:
+            print(
+                f"  {g}session basi WORK {fmt_tok(per_session)} — kisa session'larda"
+                f" sabit preamble orani sisirir, config sismesiyle karistirma{n}"
+            )
 
     rp = r["replay"]
     if rp["requests"]:
