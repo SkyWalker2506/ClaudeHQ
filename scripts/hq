@@ -51,7 +51,7 @@ ${BOLD}Commands:${NC}
   plugin list                       List all plugins with category and install status
   agent list [category]             List all agents with ID, name, category and active/pool status
   graph <subcommand>                Knowledge-graph utilities (install/build/status/docs/view)
-  history <search|recent|stats>     Search/inspect Claude Code session transcripts
+  history <search|recent|stats|profile>  Search/inspect/profile session transcripts
   hive <log|query|stats>            Shared cross-agent task log (hive mind)
 
 ${BOLD}Options:${NC}
@@ -2317,11 +2317,13 @@ cmd_history() {
         search)  history_search "$@" ;;
         recent)  history_recent "$@" ;;
         stats)   history_stats "$@" ;;
+        profile) history_profile "$@" ;;
         *)
-            echo -e "${RED}Usage:${NC} hq history <search|recent|stats> [args]"
+            echo -e "${RED}Usage:${NC} hq history <search|recent|stats|profile> [args]"
             echo "  hq history search <query> [--all]"
             echo "  hq history recent [N]"
             echo "  hq history stats"
+            echo "  hq history profile [project] [--days N] [--limit N] [--json]"
             exit 1
             ;;
     esac
@@ -2414,6 +2416,15 @@ history_recent() {
 
         printf "%-19s %-22s %s\n" "$ts_str" "$project" "${first_msg:--}"
     done <<< "$files"
+}
+
+history_profile() {
+    local py="$HQ_DIR/scripts/hq-profile.py"
+    if [[ ! -f "$py" ]]; then
+        echo -e "${RED}Error:${NC} $py not found" >&2
+        exit 1
+    fi
+    CLAUDE_SESSIONS_DIR="$CLAUDE_SESSIONS_DIR" python3 "$py" "$@"
 }
 
 history_stats() {
