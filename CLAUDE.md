@@ -47,7 +47,7 @@ ClaudeHQ, tum projeleri merkezi olarak yonetir. `~/Projects` altinda CLAUDE.md o
 - `./scripts/hq logs <proje>` — Session loglarini goster
 - `./scripts/hq history search <query> [--all]` — Tum Claude session transcript'lerinde ripgrep ile ara (default son 30 gun)
 - `./scripts/hq history recent [N]` — Son N session'i listele (default 10)
-- `./scripts/hq history stats` — Proje basina session sayisi + token kullanimi
+- `./scripts/hq history stats` — Proje basina session/istek sayisi + token kullanimi (requestId ile tekilleştirilmiş)
 - `./scripts/hq history profile [proje] [--days N] [--limit N] [--json]` — Context butcesi profili: DENSE/STREAM/WORK dagilimi, bekleme vs uretim suresi, tekrar okumalar, sicak dosya seti
 - `./scripts/hq hive log` — Son 20 hive task kaydini goster
 - `./scripts/hq hive query <agent>` — Agent adina gore hive kayitlarini filtrele

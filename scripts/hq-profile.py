@@ -272,6 +272,73 @@ def dense_files(cwd, session_dir):
     return out
 
 
+def stats_label(d, width=30):
+    """Last two path segments, so 'Million-Dollars-Project' and 'NumbersBlast
+    -Assets-Art' stay distinguishable instead of collapsing to their tail."""
+    parts = [p for p in d.name.split("-") if p]
+    if parts[:2] == ["Users", HOME.name]:
+        parts = parts[2:]
+    label = "/".join(parts[-2:]) if parts else "(home)"
+    return label[-width:] if len(label) > width else label
+
+
+def session_tokens(path):
+    """Fast pass for the per-project stats table: deduped input/output tokens.
+
+    Shares the requestId dedupe with profile_session — a single API request is
+    written as one assistant line per content block, all carrying the same
+    usage, so a naive sum roughly doubles the real figure.
+    """
+    seen = set()
+    tin = tout = 0
+    with open(path, "r", errors="replace") as fh:
+        for line in fh:
+            if '"assistant"' not in line:
+                continue
+            try:
+                d = json.loads(line)
+            except (json.JSONDecodeError, ValueError):
+                continue
+            if d.get("type") != "assistant":
+                continue
+            rid = d.get("requestId") or d.get("uuid")
+            if rid in seen:
+                continue
+            seen.add(rid)
+            usage = (d.get("message") or {}).get("usage")
+            out, cr, cc = usage_out(usage)
+            inp = (usage or {}).get("input_tokens") or 0
+            tin += inp + cr + cc
+            tout += out
+    return tin, tout, len(seen)
+
+
+def print_stats():
+    """`hq history stats` — one row per project, correctly deduped."""
+    if not SESSIONS_DIR.is_dir():
+        sys.exit(f"No sessions dir at {SESSIONS_DIR}")
+    rows = []
+    for d in sorted(SESSIONS_DIR.iterdir()):
+        if not d.is_dir():
+            continue
+        files = list(d.glob("*.jsonl"))
+        if not files:
+            continue
+        tin = tout = reqs = 0
+        for f in files:
+            a, b, c = session_tokens(f)
+            tin, tout, reqs = tin + a, tout + b, reqs + c
+        rows.append((stats_label(d), len(files), reqs, tin, tout))
+
+    rows.sort(key=lambda r: -r[4])
+    head = f"{'PROJECT':<30}{'SESSIONS':>9}{'REQUESTS':>10}{'INPUT_TOK':>18}{'OUTPUT_TOK':>13}"
+    print(head)
+    print("-" * len(head))
+    for name, n, reqs, tin, tout in rows:
+        print(f"{name:<30}{n:>9}{reqs:>10}{tin:>18,}{tout:>13,}")
+    print(f"\n{len(rows)} project(s). Input includes cache read + cache write.")
+
+
 def unused_memory_files(session_dir, mentioned):
     """Memory files whose name never appeared anywhere in the window's
     transcripts — not read, not recalled, not linked. The 'expert that routing
@@ -533,7 +600,14 @@ def main():
     ap.add_argument("--days", type=int, default=30, help="lookback window (0 = all)")
     ap.add_argument("--limit", type=int, default=0, help="max sessions (newest first)")
     ap.add_argument("--json", action="store_true", help="machine-readable output")
+    ap.add_argument(
+        "--stats", action="store_true", help="per-project token table (all projects)"
+    )
     args = ap.parse_args()
+
+    if args.stats:
+        print_stats()
+        return
 
     project = args.project or Path.cwd().name
     session_dir = find_project_dir(project)

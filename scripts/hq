@@ -2428,46 +2428,16 @@ history_profile() {
 }
 
 history_stats() {
-    if ! command -v jq >/dev/null 2>&1; then
-        echo -e "${YELLOW}jq not installed — token stats unavailable.${NC}"
-        echo "File counts per project:"
-        find "$CLAUDE_SESSIONS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while read -r d; do
-            local p n
-            p="$(basename "$d")"
-            p="${p##*-}"
-            n=$(find "$d" -name "*.jsonl" -type f 2>/dev/null | wc -l | tr -d ' ')
-            printf "  %-25s %s sessions\n" "$p" "$n"
-        done
-        return 0
+    # Delegates to hq-profile.py so the requestId dedupe lives in one place.
+    # The old jq version summed usage on every assistant line, but one API
+    # request is written as one line per content block — all repeating the same
+    # usage — so its token figures were roughly double the real ones.
+    local py="$HQ_DIR/scripts/hq-profile.py"
+    if [[ ! -f "$py" ]]; then
+        echo -e "${RED}Error:${NC} $py not found" >&2
+        exit 1
     fi
-
-    printf "${BOLD}%-25s %10s %10s %10s${NC}\n" "PROJECT" "SESSIONS" "INPUT_TOK" "OUTPUT_TOK"
-    printf "%-25s %10s %10s %10s\n" "-------" "--------" "---------" "----------"
-
-    find "$CLAUDE_SESSIONS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort | while read -r d; do
-        local project sessions stats
-        project="$(basename "$d")"
-        project="${project##*-}"
-        sessions=$(find "$d" -name "*.jsonl" -type f 2>/dev/null | wc -l | tr -d ' ')
-        [[ "$sessions" == "0" ]] && continue
-
-        stats=$(find "$d" -name "*.jsonl" -type f -print0 2>/dev/null \
-            | xargs -0 cat 2>/dev/null \
-            | jq -s -r '
-                [ .[] | (.message.usage // .usage // {}) ] as $u
-                | {
-                    in:  ([ $u[] | (.input_tokens // 0) ] | add // 0),
-                    out: ([ $u[] | (.output_tokens // 0) ] | add // 0)
-                  }
-                | "\(.in)\t\(.out)"
-            ' 2>/dev/null || echo "0	0")
-
-        local in_tok out_tok
-        in_tok="${stats%%$'\t'*}"
-        out_tok="${stats##*$'\t'}"
-        printf "%-25s %10s %10s %10s\n" "$project" "$sessions" "${in_tok:-0}" "${out_tok:-0}"
-    done
-    echo ""
+    CLAUDE_SESSIONS_DIR="$CLAUDE_SESSIONS_DIR" python3 "$py" --stats "$@"
 }
 
 # --- HIVE ---
