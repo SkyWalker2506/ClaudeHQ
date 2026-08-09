@@ -6,25 +6,7 @@
     "git": "SkyWalker2506/ArtLift",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "bootstrapper",
-    "path": "/Users/musabkara/Projects/bootstrapper",
-    "jira": null,
-    "git": null,
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "bytecraft-portfolio",
-    "path": "/Users/musabkara/Projects/bytecraft-portfolio",
-    "jira": null,
-    "git": "SkyWalker2506/bytecraft-portfolio",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "ByteCraftHQ",
@@ -33,259 +15,7 @@
     "git": "SkyWalker2506/bytecraft-hq",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-3d-forge",
-    "path": "/Users/musabkara/Projects/ccplugin-3d-forge",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-3d-forge",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-agent-browser",
-    "path": "/Users/musabkara/Projects/ccplugin-agent-browser",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-agent-browser",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-ai-review",
-    "path": "/Users/musabkara/Projects/ccplugin-ai-review",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-ai-review",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-autonomous-ops",
-    "path": "/Users/musabkara/Projects/ccplugin-autonomous-ops",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-autonomous-ops",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-backend-forge",
-    "path": "/Users/musabkara/Projects/ccplugin-backend-forge",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-backend-forge",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-clipboard",
-    "path": "/Users/musabkara/Projects/ccplugin-clipboard",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-clipboard",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-code-quality",
-    "path": "/Users/musabkara/Projects/ccplugin-code-quality",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-code-quality",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-daily-check",
-    "path": "/Users/musabkara/Projects/ccplugin-daily-check",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-daily-check",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-devtools-setup",
-    "path": "/Users/musabkara/Projects/ccplugin-devtools-setup",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-devtools-setup",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-flutter-firebase",
-    "path": "/Users/musabkara/Projects/ccplugin-flutter-firebase",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-flutter-firebase",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-frontend-craft",
-    "path": "/Users/musabkara/Projects/ccplugin-frontend-craft",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-frontend-craft",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-git-github",
-    "path": "/Users/musabkara/Projects/ccplugin-git-github",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-git-github",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-improve",
-    "path": "/Users/musabkara/Projects/ccplugin-improve",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-improve",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-jira-suite",
-    "path": "/Users/musabkara/Projects/ccplugin-jira-suite",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-jira-suite",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-notifications",
-    "path": "/Users/musabkara/Projects/ccplugin-notifications",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-notifications",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-opencode-bridge",
-    "path": "/Users/musabkara/Projects/ccplugin-opencode-bridge",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-opencode-bridge",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-research-tools",
-    "path": "/Users/musabkara/Projects/ccplugin-research-tools",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-research-tools",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-sprint-planner",
-    "path": "/Users/musabkara/Projects/ccplugin-sprint-planner",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-sprint-planner",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-sync-agents",
-    "path": "/Users/musabkara/Projects/ccplugin-sync-agents",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-sync-agents",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-telegram",
-    "path": "/Users/musabkara/Projects/ccplugin-telegram",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-telegram",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-unity-craft",
-    "path": "/Users/musabkara/Projects/ccplugin-unity-craft",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-unity-craft",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "ccplugin-voice-input",
-    "path": "/Users/musabkara/Projects/ccplugin-voice-input",
-    "jira": null,
-    "git": "SkyWalker2506/ccplugin-voice-input",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "claude-agent-catalog",
-    "path": "/Users/musabkara/Projects/claude-agent-catalog",
-    "jira": null,
-    "git": "SkyWalker2506/claude-agent-catalog",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "claude-config",
-    "path": "/Users/musabkara/Projects/claude-config",
-    "jira": null,
-    "git": "SkyWalker2506/claude-config",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "claude-design-system",
-    "path": "/Users/musabkara/Projects/claude-design-system",
-    "jira": null,
-    "git": "SkyWalker2506/claude-design-system",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "claude-marketplace",
-    "path": "/Users/musabkara/Projects/claude-marketplace",
-    "jira": null,
-    "git": "SkyWalker2506/claude-marketplace",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "claude-plugins",
-    "path": "/Users/musabkara/Projects/claude-plugins",
-    "jira": null,
-    "git": "SkyWalker2506/claude-marketplace",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "Projects",
-    "path": "/Users/musabkara/Projects",
-    "jira": null,
-    "git": null,
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "CoinHQ",
@@ -294,61 +24,7 @@
     "git": "SkyWalker2506/CoinHQ",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "craft-unity",
-    "path": "/Users/musabkara/Projects/craft-unity",
-    "jira": null,
-    "git": "SkyWalker2506/craft-unity",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "demo-site",
-    "path": "/Users/musabkara/Projects/demo-site",
-    "jira": null,
-    "git": null,
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "docs",
-    "path": "/Users/musabkara/Projects/docs",
-    "jira": null,
-    "git": null,
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "feedback_tester",
-    "path": "/Users/musabkara/Projects/feedback_tester",
-    "jira": null,
-    "git": null,
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "flutter_feedback_kit",
-    "path": "/Users/musabkara/Projects/flutter_feedback_kit",
-    "jira": null,
-    "git": "SkyWalker2506/flutter_feedback_kit",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "football-ai-platform",
-    "path": "/Users/musabkara/Projects/football-ai-platform",
-    "jira": null,
-    "git": "BlackMountainsStudio/tartismalipozisyonlar",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "GameFactory",
@@ -357,7 +33,7 @@
     "git": "SkyWalker2506/GameFactory",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "Gardirop",
@@ -366,16 +42,7 @@
     "git": "SkyWalker2506/gardirop",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "golf-paper-craft",
-    "path": "/Users/musabkara/Projects/golf-paper-craft",
-    "jira": null,
-    "git": "SkyWalker2506/golf-paper-craft",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "GothicDeckBuilder",
@@ -384,25 +51,7 @@
     "git": "SkyWalker2506/GothicDeckBuilder",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "hisse-defteri",
-    "path": "/Users/musabkara/Projects/hisse-defteri",
-    "jira": null,
-    "git": "SkyWalker2506/hisse-defteri",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "kingdom-lines",
-    "path": "/Users/musabkara/Projects/kingdom-lines",
-    "jira": null,
-    "git": "SkyWalker2506/kingdom-lines",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "KnightOnlineAI",
@@ -411,7 +60,7 @@
     "git": "SkyWalker2506/KnightOnlineAI",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "LudoMultiplayer",
@@ -420,7 +69,7 @@
     "git": "SkyWalker2506/ludo-multiplayer",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "MultiMind-Kids-Brain-Games-CrossPlatform",
@@ -429,34 +78,7 @@
     "git": "SkyWalker2506/MultiMind-Kids-Brain-Games-CrossPlatform",
     "active": true,
     "currentSprint": 1,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "nakkas",
-    "path": "/Users/musabkara/Projects/nakkas",
-    "jira": null,
-    "git": "SkyWalker2506/nakkas",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "prism-tycoon-integrate",
-    "path": "/Users/musabkara/Projects/prism-tycoon-integrate",
-    "jira": null,
-    "git": null,
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "prism-tycoon",
-    "path": "/Users/musabkara/Projects/prism-tycoon",
-    "jira": null,
-    "git": "SkyWalker2506/prism-tycoon",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "ProjeBirlik",
@@ -465,7 +87,7 @@
     "git": "SkyWalker2506/projebirlik",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "RefinUp",
@@ -474,34 +96,7 @@
     "git": "SkyWalker2506/RefinUp",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "trading-bot",
-    "path": "/Users/musabkara/Projects/trading-bot",
-    "jira": null,
-    "git": "SkyWalker2506/trading-bot",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "transcriptr",
-    "path": "/Users/musabkara/Projects/transcriptr",
-    "jira": null,
-    "git": "SkyWalker2506/transcriptr",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
-  },
-  {
-    "name": "unity-game-factory",
-    "path": "/Users/musabkara/Projects/unity-game-factory",
-    "jira": null,
-    "git": "SkyWalker2506/unity-game-factory",
-    "active": true,
-    "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
     "name": "Viralyze",
@@ -510,25 +105,438 @@
     "git": "SkyWalker2506/Viralyze",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-18"
+    "discoveredAt": "2026-08-09"
   },
   {
-    "name": "color-model-sort-3d",
-    "path": "/Users/musabkara/Documents/Unity/color-model-sort-3d",
+    "name": "bootstrapper",
+    "path": "/Users/musabkara/Projects/bootstrapper",
     "jira": null,
-    "git": "SkyWalker2506/color-model-sort-3d",
+    "git": null,
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-07-22"
+    "discoveredAt": "2026-08-09"
   },
   {
-    "name": "DeckbuilderToolkit",
-    "path": "/Users/musabkara/Documents/Unity/DeckbuilderToolkit",
+    "name": "bytecraft-portfolio",
+    "path": "/Users/musabkara/Projects/bytecraft-portfolio",
     "jira": null,
-    "git": "SkyWalker2506/deckbuilder-toolkit",
+    "git": "SkyWalker2506/bytecraft-portfolio",
     "active": true,
     "currentSprint": null,
-    "discoveredAt": "2026-08-02",
-    "note": "Unity 6000.4.3f1 project; lives outside ~/Projects so `hq scan` needs HQ_PROJECTS_ROOT=~/Documents/Unity"
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-3d-forge",
+    "path": "/Users/musabkara/Projects/ccplugin-3d-forge",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-3d-forge",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-agent-browser",
+    "path": "/Users/musabkara/Projects/ccplugin-agent-browser",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-agent-browser",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-ai-review",
+    "path": "/Users/musabkara/Projects/ccplugin-ai-review",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-ai-review",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-autonomous-ops",
+    "path": "/Users/musabkara/Projects/ccplugin-autonomous-ops",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-autonomous-ops",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-backend-forge",
+    "path": "/Users/musabkara/Projects/ccplugin-backend-forge",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-backend-forge",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-clipboard",
+    "path": "/Users/musabkara/Projects/ccplugin-clipboard",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-clipboard",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-code-quality",
+    "path": "/Users/musabkara/Projects/ccplugin-code-quality",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-code-quality",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-daily-check",
+    "path": "/Users/musabkara/Projects/ccplugin-daily-check",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-daily-check",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-devtools-setup",
+    "path": "/Users/musabkara/Projects/ccplugin-devtools-setup",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-devtools-setup",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-flutter-firebase",
+    "path": "/Users/musabkara/Projects/ccplugin-flutter-firebase",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-flutter-firebase",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-frontend-craft",
+    "path": "/Users/musabkara/Projects/ccplugin-frontend-craft",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-frontend-craft",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-git-github",
+    "path": "/Users/musabkara/Projects/ccplugin-git-github",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-git-github",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-improve",
+    "path": "/Users/musabkara/Projects/ccplugin-improve",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-improve",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-jira-suite",
+    "path": "/Users/musabkara/Projects/ccplugin-jira-suite",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-jira-suite",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-notifications",
+    "path": "/Users/musabkara/Projects/ccplugin-notifications",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-notifications",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-opencode-bridge",
+    "path": "/Users/musabkara/Projects/ccplugin-opencode-bridge",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-opencode-bridge",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-research-tools",
+    "path": "/Users/musabkara/Projects/ccplugin-research-tools",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-research-tools",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-sprint-planner",
+    "path": "/Users/musabkara/Projects/ccplugin-sprint-planner",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-sprint-planner",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-sync-agents",
+    "path": "/Users/musabkara/Projects/ccplugin-sync-agents",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-sync-agents",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-telegram",
+    "path": "/Users/musabkara/Projects/ccplugin-telegram",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-telegram",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-unity-craft",
+    "path": "/Users/musabkara/Projects/ccplugin-unity-craft",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-unity-craft",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "ccplugin-voice-input",
+    "path": "/Users/musabkara/Projects/ccplugin-voice-input",
+    "jira": null,
+    "git": "SkyWalker2506/ccplugin-voice-input",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "claude-agent-catalog",
+    "path": "/Users/musabkara/Projects/claude-agent-catalog",
+    "jira": null,
+    "git": "SkyWalker2506/claude-agent-catalog",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "claude-config",
+    "path": "/Users/musabkara/Projects/claude-config",
+    "jira": null,
+    "git": "SkyWalker2506/claude-config",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "claude-design-system",
+    "path": "/Users/musabkara/Projects/claude-design-system",
+    "jira": null,
+    "git": "SkyWalker2506/claude-design-system",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "claude-marketplace",
+    "path": "/Users/musabkara/Projects/claude-marketplace",
+    "jira": null,
+    "git": "SkyWalker2506/claude-marketplace",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "claude-plugins",
+    "path": "/Users/musabkara/Projects/claude-plugins",
+    "jira": null,
+    "git": "SkyWalker2506/claude-marketplace",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "cozy-critter-cafe",
+    "path": "/Users/musabkara/Projects/cozy-critter-cafe",
+    "jira": null,
+    "git": "SkyWalker2506/cozy-critter-cafe",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "craft-unity",
+    "path": "/Users/musabkara/Projects/craft-unity",
+    "jira": null,
+    "git": "SkyWalker2506/craft-unity",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "demo-site",
+    "path": "/Users/musabkara/Projects/demo-site",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "docs",
+    "path": "/Users/musabkara/Projects/docs",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "feedback_tester",
+    "path": "/Users/musabkara/Projects/feedback_tester",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "flutter_feedback_kit",
+    "path": "/Users/musabkara/Projects/flutter_feedback_kit",
+    "jira": null,
+    "git": "SkyWalker2506/flutter_feedback_kit",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "football-ai-platform",
+    "path": "/Users/musabkara/Projects/football-ai-platform",
+    "jira": null,
+    "git": "BlackMountainsStudio/tartismalipozisyonlar",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "golf-paper-craft",
+    "path": "/Users/musabkara/Projects/golf-paper-craft",
+    "jira": null,
+    "git": "SkyWalker2506/golf-paper-craft",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "hisse-defteri",
+    "path": "/Users/musabkara/Projects/hisse-defteri",
+    "jira": null,
+    "git": "SkyWalker2506/hisse-defteri",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "kingdom-lines",
+    "path": "/Users/musabkara/Projects/kingdom-lines",
+    "jira": null,
+    "git": "SkyWalker2506/kingdom-lines",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "nakkas",
+    "path": "/Users/musabkara/Projects/nakkas",
+    "jira": null,
+    "git": "SkyWalker2506/nakkas",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "nota-kavgasi",
+    "path": "/Users/musabkara/Projects/nota-kavgasi",
+    "jira": null,
+    "git": "SkyWalker2506/nota-kavgasi",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "prism-tycoon-integrate",
+    "path": "/Users/musabkara/Projects/prism-tycoon-integrate",
+    "jira": null,
+    "git": null,
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "prism-tycoon",
+    "path": "/Users/musabkara/Projects/prism-tycoon",
+    "jira": null,
+    "git": "SkyWalker2506/prism-tycoon",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "symphony-deckbuilder",
+    "path": "/Users/musabkara/Projects/symphony-deckbuilder",
+    "jira": null,
+    "git": "SkyWalker2506/symphony-deckbuilder",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "trading-bot",
+    "path": "/Users/musabkara/Projects/trading-bot",
+    "jira": null,
+    "git": "SkyWalker2506/trading-bot",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "transcriptr",
+    "path": "/Users/musabkara/Projects/transcriptr",
+    "jira": null,
+    "git": "SkyWalker2506/transcriptr",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "unity-game-factory",
+    "path": "/Users/musabkara/Projects/unity-game-factory",
+    "jira": null,
+    "git": "SkyWalker2506/unity-game-factory",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "world-dominion",
+    "path": "/Users/musabkara/Projects/world-dominion",
+    "jira": null,
+    "git": "SkyWalker2506/world-dominion",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-09"
   }
 ]
