@@ -108,6 +108,15 @@
     "discoveredAt": "2026-08-09"
   },
   {
+    "name": "animation-creator",
+    "path": "/Users/musabkara/Projects/animation-creator",
+    "jira": null,
+    "git": "SkyWalker2506/animation-creator",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-11"
+  },
+  {
     "name": "bootstrapper",
     "path": "/Users/musabkara/Projects/bootstrapper",
     "jira": null,
@@ -466,6 +475,15 @@
     "active": true,
     "currentSprint": null,
     "discoveredAt": "2026-08-09"
+  },
+  {
+    "name": "necrobeat",
+    "path": "/Users/musabkara/Projects/necrobeat",
+    "jira": null,
+    "git": "SkyWalker2506/necrobeat",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-11"
   },
   {
     "name": "nota-kavgasi",

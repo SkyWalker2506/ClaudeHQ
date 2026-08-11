@@ -111,15 +111,22 @@ cmd_scan() {
             jira_key=$(grep -i '^jira:' "$project_dir/.claude/index.md" 2>/dev/null | head -1 | sed 's/^jira:[[:space:]]*//' | tr -d '[:space:]' || true)
         fi
 
-        # Check if already in projects.json to preserve active/sprint state
+        # Check if already in projects.json to preserve active/sprint state.
+        # discoveredAt is preserved too: it means "ilk gorulme", not "son
+        # tarama". Her kosuda bugunun tarihi yazilinca dosya hic degismemis
+        # projelerde bile 60 satir degismis gorunuyordu ve gercek degisiklik
+        # (yeni/silinen proje) o gurultunun icinde kayboluyordu.
         local existing_active="true"
         local existing_sprint="null"
+        local existing_date=""
         if [[ -f "$PROJECTS_FILE" ]]; then
             existing_active=$(jq -r --arg name "$project_name" '.[] | select(.name == $name) | .active // true' "$PROJECTS_FILE" 2>/dev/null || echo "true")
             existing_sprint=$(jq -r --arg name "$project_name" '.[] | select(.name == $name) | .currentSprint // null' "$PROJECTS_FILE" 2>/dev/null || echo "null")
+            existing_date=$(jq -r --arg name "$project_name" '.[] | select(.name == $name) | .discoveredAt // empty' "$PROJECTS_FILE" 2>/dev/null || echo "")
             [[ -z "$existing_active" ]] && existing_active="true"
             [[ -z "$existing_sprint" ]] && existing_sprint="null"
         fi
+        [[ -z "$existing_date" ]] && existing_date="$(date +%Y-%m-%d)"
 
         # Build project entry
         local entry
@@ -130,7 +137,7 @@ cmd_scan() {
             --arg git "$git_remote" \
             --argjson active "$existing_active" \
             --argjson sprint "$existing_sprint" \
-            --arg date "$(date +%Y-%m-%d)" \
+            --arg date "$existing_date" \
             '{
                 name: $name,
                 path: $path,
