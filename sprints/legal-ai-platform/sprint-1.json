@@ -1,0 +1,18 @@
+{
+  "project": "legal-ai-platform",
+  "sprint": 1,
+  "goal": "",
+  "status": "planning",
+  "startDate": "2026-08-11",
+  "endDate": "",
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "",
+      "status": "todo",
+      "description": "",
+      "branch": "",
+      "assignedPrompt": "advance"
+    }
+  ]
+}

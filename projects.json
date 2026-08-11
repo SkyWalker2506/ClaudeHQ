@@ -468,6 +468,15 @@
     "discoveredAt": "2026-08-09"
   },
   {
+    "name": "legal-ai-platform",
+    "path": "/Users/musabkara/Projects/legal-ai-platform",
+    "jira": null,
+    "git": "SkyWalker2506/legal-ai-platform",
+    "active": true,
+    "currentSprint": null,
+    "discoveredAt": "2026-08-11"
+  },
+  {
     "name": "nakkas",
     "path": "/Users/musabkara/Projects/nakkas",
     "jira": null,
