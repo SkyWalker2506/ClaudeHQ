@@ -10,6 +10,7 @@ PROGRESS_DIR="$HQ_DIR/progress"
 SPRINTS_DIR="$HQ_DIR/sprints"
 PROJECTS_FILE="$HQ_DIR/projects.json"
 TEMPLATES_DIR="$HQ_DIR/templates"
+TEAM_FILE="$HQ_DIR/team.json"
 FEATURES_DIR="$HQ_DIR/features"
 
 # Colors
@@ -692,6 +693,7 @@ cmd_new() {
     local jira_key=""
     local git_org="SkyWalker2506"
     local template=""
+    local collaborators=()
 
     # Parse args
     while [[ $# -gt 0 ]]; do
@@ -699,13 +701,20 @@ cmd_new() {
             --jira)  jira_key="${2:-}"; shift 2 ;;
             --git-org) git_org="${2:-}"; shift 2 ;;
             --template) template="${2:-}"; shift 2 ;;
+            --collab)
+                # Comma or space separated names, resolved against team.json.
+                IFS=',' read -ra _names <<< "${2:-}"
+                for _n in "${_names[@]}"; do
+                    [[ -n "$_n" ]] && collaborators+=("$(echo "$_n" | xargs)")
+                done
+                shift 2 ;;
             -*) echo -e "${RED}Unknown option:${NC} $1"; exit 1 ;;
             *)  project_name="$1"; shift ;;
         esac
     done
 
     if [[ -z "$project_name" ]]; then
-        echo -e "${RED}Usage:${NC} hq new <project-name> [--jira KEY] [--git-org ORG] [--template NAME]"
+        echo -e "${RED}Usage:${NC} hq new <project-name> [--jira KEY] [--git-org ORG] [--template NAME] [--collab isim,isim]"
         exit 1
     fi
 
@@ -803,6 +812,11 @@ README
         else
             echo -e "  ${YELLOW}!${NC} GitHub repo creation failed (may already exist or no auth)"
         fi
+
+        # 8b. Invite collaborators by name (team.json resolves the logins)
+        if [[ ${#collaborators[@]} -gt 0 ]]; then
+            team_invite "${git_org}/${project_name}" "${collaborators[@]}" || true
+        fi
     fi
 
     # 9. Initialize sprint tracking
@@ -823,6 +837,114 @@ README
     echo "  1. Edit sprints/$project_name/sprint-1.json to define tasks"
     echo "  2. hq session $project_name"
     echo "  3. hq status"
+}
+
+
+# --- TEAM / COLLABORATORS ---
+
+# Resolve a human name to a GitHub login using team.json. Matches name, github
+# handle or alias, case-insensitively; a unique prefix is enough. Prints the
+# login on success, nothing on failure.
+team_lookup() {
+    local query="$1"
+    [[ -f "$TEAM_FILE" ]] || return 1
+
+    jq -r --arg q "$(echo "$query" | tr '[:upper:]' '[:lower:]')" '
+        [ .people[]
+          | . as $p
+          | ( [ ($p.name | ascii_downcase), ($p.github | ascii_downcase) ]
+              + ($p.aliases // [] | map(ascii_downcase)) ) as $keys
+          | select( ($keys | index($q)) != null
+                    or ($keys | map(startswith($q)) | any) )
+        ] | unique_by(.github)
+    ' "$TEAM_FILE" 2>/dev/null > /tmp/hq_team_match.$$ || return 1
+
+    local count
+    count=$(jq 'length' /tmp/hq_team_match.$$ 2>/dev/null || echo 0)
+
+    if [[ "$count" == "1" ]]; then
+        jq -r '.[0].github' /tmp/hq_team_match.$$
+        rm -f /tmp/hq_team_match.$$
+        return 0
+    fi
+
+    if [[ "$count" == "0" ]]; then
+        echo -e "  ${RED}?${NC} '$query' team.json icinde yok" >&2
+    else
+        echo -e "  ${YELLOW}!${NC} '$query' birden fazla kisiyle esilesti:" >&2
+        jq -r '.[] | "      \(.name) (\(.github))"' /tmp/hq_team_match.$$ >&2
+    fi
+    rm -f /tmp/hq_team_match.$$
+    return 1
+}
+
+team_permission() {
+    jq -r --arg g "$1" '.people[] | select(.github == $g) | .permission // "push"' "$TEAM_FILE" 2>/dev/null
+}
+
+# Invite one or more people (by name) to a repo. repo is "org/name".
+team_invite() {
+    local repo="$1"; shift
+    local failed=0
+
+    for who in "$@"; do
+        local login
+        login=$(team_lookup "$who") || { failed=1; continue; }
+        [[ "$login" == "SkyWalker2506" ]] && continue  # owner
+
+        local perm
+        perm=$(team_permission "$login")
+        if gh api -X PUT "repos/${repo}/collaborators/${login}" \
+                -f permission="${perm:-push}" >/dev/null 2>&1; then
+            echo -e "  ${GREEN}+${NC} $login davet edildi (${perm:-push})"
+        else
+            echo -e "  ${YELLOW}!${NC} $login davet edilemedi"
+            failed=1
+        fi
+    done
+    return $failed
+}
+
+cmd_team() {
+    local sub="${1:-list}"; shift || true
+
+    case "$sub" in
+        list)
+            if [[ ! -f "$TEAM_FILE" ]]; then
+                echo -e "${RED}Error:${NC} team.json yok"
+                exit 1
+            fi
+            echo -e "${BOLD}Ekip${NC}  (team.json)"
+            echo ""
+            jq -r '.people[] | "  \(.name)|\(.github)|\((.teams // []) | join(","))|\(.permission // "push")"' "$TEAM_FILE" \
+                | while IFS='|' read -r name gh teams perm; do
+                    printf "  %-16s %-16s %-18s %s\n" "$name" "$gh" "$teams" "$perm"
+                done
+            ;;
+        add)
+            local project="${1:?Usage: hq team add <proje> <isim> [isim...]}"; shift
+            [[ $# -gt 0 ]] || { echo -e "${RED}Usage:${NC} hq team add <proje> <isim> [isim...]"; exit 1; }
+
+            local repo
+            repo=$(jq -r --arg name "$project" '.[] | select(.name == $name) | .git' "$PROJECTS_FILE" 2>/dev/null)
+            if [[ -z "$repo" || "$repo" == "null" ]]; then
+                echo -e "${RED}Error:${NC} '$project' icin git repo bulunamadi (hq scan?)"
+                exit 1
+            fi
+
+            echo -e "${BLUE}Davet ediliyor${NC} $repo..."
+            team_invite "$repo" "$@"
+            ;;
+        who)
+            local query="${1:?Usage: hq team who <isim>}"
+            local login
+            login=$(team_lookup "$query") && echo "$login"
+            ;;
+        *)
+            echo -e "${RED}Usage:${NC} hq team [list|add <proje> <isim>...|who <isim>]"
+            exit 1
+            ;;
+    esac
 }
 
 # --- ARCHIVE / ACTIVATE ---
@@ -2564,6 +2686,7 @@ case "${1:-}" in
     stuck)      shift; cmd_stuck "$@" ;;
     archive)    shift; cmd_archive "$@" ;;
     activate)   shift; cmd_activate "$@" ;;
+    team)       shift; cmd_team "$@" ;;
     config)     shift; cmd_config "$@" ;;
     logs)       shift; cmd_logs "$@" ;;
     sync)       shift; exec "$HQ_DIR/scripts/sync-ecosystem.sh" "$@" ;;

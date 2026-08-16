@@ -1,0 +1,47 @@
+{
+  "_comment": "Name -> GitHub account roster. 'hq new --collab' and 'hq team add' resolve names against this file so nobody has to remember logins. Match is case-insensitive against name, github and aliases; a unique prefix is enough.",
+  "teams": {
+    "black-mountains": {
+      "org": "BlackMountainsStudio",
+      "description": "Black Mountains Studio"
+    }
+  },
+  "people": [
+    {
+      "name": "Fatih",
+      "github": "FFC12",
+      "aliases": ["fatih", "ffc12"],
+      "teams": ["black-mountains"],
+      "permission": "push"
+    },
+    {
+      "name": "Emirhan Dur",
+      "github": "emirhandur9",
+      "aliases": ["emirhan", "emir"],
+      "teams": ["black-mountains"],
+      "permission": "push"
+    },
+    {
+      "name": "Emre Hisir",
+      "github": "emrehisir",
+      "aliases": ["emre"],
+      "teams": ["black-mountains"],
+      "permission": "push"
+    },
+    {
+      "name": "Sunal Orhon",
+      "github": "Orhonbey",
+      "aliases": ["sunal", "orhon", "orhonbey"],
+      "teams": ["black-mountains"],
+      "permission": "push"
+    },
+    {
+      "name": "Musab Kara",
+      "github": "SkyWalker2506",
+      "aliases": ["musab", "ben", "me"],
+      "teams": ["black-mountains"],
+      "permission": "admin",
+      "owner": true
+    }
+  ]
+}

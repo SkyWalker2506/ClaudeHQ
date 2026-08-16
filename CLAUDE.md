@@ -31,7 +31,7 @@ ClaudeHQ, tum projeleri merkezi olarak yonetir. `~/Projects` altinda CLAUDE.md o
 
 - `./scripts/hq bootstrap [--all]` — Yeni PC'de tum ekosistemi kur (config, secrets, repos, install)
 - `./scripts/hq scan` — ~/Projects tara, projects.json olustur/guncelle
-- `./scripts/hq new <isim> [--jira KEY]` — Yeni proje olustur (git, CLAUDE.md, sprint dahil)
+- `./scripts/hq new <isim> [--jira KEY] [--collab isim,isim]` — Yeni proje olustur (git, CLAUDE.md, sprint dahil); `--collab` ile ekip arkadaslarini isimle davet et
 - `./scripts/hq session <proje>` — Tek proje icin Claude session baslat
 - `./scripts/hq session --all` — Tum aktif projeler icin toplu session baslat
 - `./scripts/hq dispatch <proje>` — (Deprecated) `session` icin alias; kullanmaktan kacinin
@@ -41,6 +41,9 @@ ClaudeHQ, tum projeleri merkezi olarak yonetir. `~/Projects` altinda CLAUDE.md o
 - `./scripts/hq sprint init <proje>` — Proje icin sprint tracking baslat
 - `./scripts/hq monitor [--watch]` — Calisan session'lari izle
 - `./scripts/hq stuck` — Takilan projeleri goster
+- `./scripts/hq team [list]` — Ekip listesi (isim -> GitHub hesabi)
+- `./scripts/hq team who <isim>` — Isimden GitHub hesabini bul
+- `./scripts/hq team add <proje> <isim> [isim...]` — Mevcut repoya isimle ortak calisan davet et
 - `./scripts/hq archive <proje>` — Projeyi pasife al
 - `./scripts/hq activate <proje>` — Projeyi aktife al
 - `./scripts/hq config [proje]` — Proje konfigurasyonunu goster
@@ -56,6 +59,7 @@ ClaudeHQ, tum projeleri merkezi olarak yonetir. `~/Projects` altinda CLAUDE.md o
 ### Dosya Yapisi
 
 - `projects.json` — Otomatik kesfedilen projeler (gitignored, `hq scan` ile olusur)
+- `team.json` — Ekip listesi: isim -> GitHub hesabi, takma adlar, varsayilan yetki
 - `sprints/{proje}/sprint-{N}.json` — Sprint tanimlari ve task'lar
 - `progress/{proje}.json` — Otomatik ilerleme takibi (gitignored)
 - `templates/` — Sprint ve task prompt sablonlari
@@ -93,6 +97,23 @@ Agent, plugin veya skill eklendiginde/silindiginde/degistiginde **tum downstream
 1. Agent/plugin/skill degisikligi yapildiginda `hq sync` calistir
 2. Guncellenen dosyalari ilgili repo'larinda commit et
 3. README'lerdeki sayilari asla elle yazma — her zaman `hq sync` kullan
+
+## Ekip / ortak calisanlar
+
+GitHub kullanici adlarini ezberlemek yok: `team.json` isimden hesaba cevirir.
+Eslesme isim, GitHub handle ve takma adlar uzerinden, buyuk/kucuk harf
+duyarsiz calisir; benzersiz bir on-ek yeter (`fatih`, `emir`, `sunal`).
+Birden fazla kisiye uyarsa komut adaylari listeler ve hicbir sey yapmaz.
+
+```bash
+./scripts/hq team list                              # kim var
+./scripts/hq team who emir                          # -> emirhandur9
+./scripts/hq new yeni-oyun --collab fatih,sunal     # repo acilirken davet et
+./scripts/hq team add veil-of-the-last-king fatih   # mevcut repoya ekle
+```
+
+Yeni biri katildiginda `team.json`'a eklenir; `github` alani zorunlu, `aliases`
+gunluk kullanilan ismi tasir, `permission` yazilmazsa `push` kabul edilir.
 
 ## Yeni proje kurma
 
