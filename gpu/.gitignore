@@ -1,1 +1,4 @@
 hakem-durum.json
+build/
+dist/
+*.spec
