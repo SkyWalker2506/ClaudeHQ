@@ -51,6 +51,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -66,9 +67,34 @@ BAYAT_SN = 900
 #: Damga yenileme araligi — tutucunun `canli()` cagirma sikligi.
 NABIZ_SN = 30
 
-VARSAYILAN_DOSYA = Path(
-    os.environ.get("GPU_HAKEM_DOSYA",
-                   str(Path(__file__).resolve().parent / "hakem-durum.json")))
+def _varsayilan_dosya() -> Path:
+    """Durum dosyasinin yeri — DONMUS exe'de `__file__` guvenilmez.
+
+    PyInstaller onefile paketinde bu modul gecici bir dizine (`sys._MEIPASS`)
+    acilir; `Path(__file__).parent` her calistirmada BASKA bir klasordur. Yani
+    donmus panel kendi ozel durum dosyasini yazar ve hatlarin yazdigini hic
+    gormez: panel "bosta" gosterirken hatlar sirayla calisir.
+
+    Bu, tespit edilmesi zor bir hata sinifi — panel calisiyor gorunur, yalniz
+    yanlis seyi gosterir. O yuzden donmus surumde `__file__` HIC
+    kullanilmiyor; sabit yol ya da ortam degiskeni.
+    """
+    acik = os.environ.get("GPU_HAKEM_DOSYA")
+    if acik:
+        return Path(acik)
+    if getattr(sys, "frozen", False):
+        for dizin in (os.environ.get("GPU_HAKEM_DIZIN"),
+                      r"D:\Projects\ClaudeHQ\gpu",
+                      os.path.expanduser("~/Projects/ClaudeHQ/gpu")):
+            if dizin and Path(dizin).is_dir():
+                return Path(dizin) / "hakem-durum.json"
+        # Hicbiri yoksa kullanici profilinde ortak bir yer — gecici dizin
+        # DEGIL: gecici dizin her calistirmada degisir ve kilit paylasilmaz.
+        return Path(os.path.expanduser("~")) / ".gpu-hakem-durum.json"
+    return Path(__file__).resolve().parent / "hakem-durum.json"
+
+
+VARSAYILAN_DOSYA = _varsayilan_dosya()
 
 
 class Hakem:
@@ -113,8 +139,21 @@ class Hakem:
     # --- kullanicinin ayari ----------------------------------------------- #
 
     def paralel_ayarla(self, acik: bool) -> None:
+        """Paralel modu ac/kapa.
+
+        Acarken kilit durumu TEMIZLENIR. Sebep olculdu: paralel modda `iste()`
+        dosyaya hic dokunmadan True donuyor, dolayisiyla o sirada kilidi tutan
+        hat onu hic birakmiyor ve `tutan` eski halinde DONUYOR. Paralel geri
+        kapatildiginda bu hayalet kilit ortaya cikiyor ve oteki uc hat, damga
+        bayatlayana kadar (15 dakika) bosu bosuna bekliyor.
+
+        Temizlemek dogru olan: paralel modda kimse kimseyi beklemiyorsa,
+        "kim tutuyor" sorusunun cevabi da yoktur.
+        """
         d = self._oku()
         d["paralel"] = bool(acik)
+        if acik:
+            d.update(tutan=None, damga=0.0, yigin=[], birak_istegi=False)
         self._yaz(d)
 
     def paralel_mi(self) -> bool:

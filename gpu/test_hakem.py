@@ -148,6 +148,27 @@ class ParalelTesti(Temel):
         self.h.paralel_ayarla(True)
         self.assertTrue(H.Hakem(self.h.dosya).paralel_mi())
 
+    def test_paralel_acilinca_HAYALET_KILIT_kalmiyor(self):
+        """Olculdu: paralel modda iste() dosyaya dokunmadan True donuyor,
+        yani o an kilidi tutan hat onu HIC birakmiyor ve `tutan` donuyor.
+        Paralel kapatilinca bu hayalet kilit ortaya cikip oteki hatlari 15
+        dakika bekletirdi."""
+        self.h.iste("video")
+        self.assertEqual(self.h.durum()["tutan"], "video")
+        self.h.paralel_ayarla(True)
+        self.assertIsNone(self.h.durum()["tutan"])
+        # ve paralel kapaninca baska bir hat ANINDA alabilmeli
+        self.h.paralel_ayarla(False)
+        self.assertTrue(self.h.iste("resim"))
+
+    def test_paralel_acilinca_BEKLEYENLER_de_temizleniyor(self):
+        """Yiginda kalan bekleyenler, paralel kapaninca sirasi gelmemis
+        hayalet istekler olarak geri donerdi."""
+        self.h.iste("video")
+        self.h.iste("ses")
+        self.h.paralel_ayarla(True)
+        self.assertEqual(self.h.durum()["bekleyenler"], [])
+
 
 class CokmeTesti(Temel):
     def test_olu_kilit_devralinir(self):
