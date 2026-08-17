@@ -46,3 +46,12 @@ generated-images/
 gdb-*.png
 gothic-deck-builder.png
 GPUKontrol.exe
+
+# Oturum kalintilari ve derleme onbellegi — depoda isi yok.
+# "C:TMPasst_msgs.txt" bozuk adli bir dosya: heredoc ters bolu kacisi
+# yuzunden olusmustu (bash araci , 
+,  dizilerini bozuyor).
+__pycache__/
+*.pyc
+session_msgs.txt
+C:TMP*
