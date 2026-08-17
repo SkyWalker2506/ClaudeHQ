@@ -1,0 +1,436 @@
+Asst msgs: 101
+
+=== L356 ===
+Bulundu: `semi` (alfa<255) ile `opaque` (alfa≥250) kümeleri çakışıyor — beyaza boyanan 250–254 alfalı pikseller referansın kendisine giriyor. Kümeleri ayrıştırıyorum.
+
+=== L434 ===
+## ClaudeHQ
+
+`fix/hq-scan-windows-symlink-copy` → `main`'e merge edildi. `main` önce `origin/main`'e fast-forward edildi (6 commit: kb-baseline araçları), sonra fix merge oldu. Şu an `main`'de, **ahead 2** — push etmedim, söylersen atarım. Lokal `projects.json` stash'te (generated dosya, iki tarafta da değişmişti).
+
+## bm-sprite-forge — Gate 0 kapısı
+
+Repo zaten `D:\Projects`'teydi, ikisi de pull edildi. **İlk GPU koşumu yapıldı.**
+
+**Kapı ölçümü — dördü de iki yolu da koştu:**
+
+| kapı | öldürme | yanlış-poz |
+|---|---|---|
+| `text.ocr` | 100% (4/4) | 0% (0/4) |
+| `alpha.presence` | 100% (12/12) | 0% (0/6) |
+| `alpha.edge` | 100% (12/12) | 0% (0/6) |
+| `readability.small` | 100% (6/6) | 0% (0/6) |
+
+`python -m pytest tests/` → **35/35**. Brief regresyon testinin *düşebildiği* de doğrulandı.
+
+=== L442 ===
+(Jarvis | Opus 5)
+
+Engellenmemiş en yüksek değerli iş matting — 6/6 reddin sebebi o. Onunla başlıyorum.
+
+=== L460 ===
+Zincir net: `RemoveBackground` → MASK → `JoinImageWithAlpha` → RGBA. Matting'i hatta ekliyorum, ayrıca VRAM tepesini örnekleyeceğim.
+
+=== L505 ===
+Üç yeni sinyal var ve ikisi ciddi: metin kapısının öldürme oranı **%0'a düştü**, okunabilirlik kapısı artık portre ve armalarda düşüyor. Veriye bakıyorum.
+
+=== L515 ===
+Kök neden bulundu ve ciddi: matting'in ürettiği opak alfa **254**, 255 değil. Kapılarım tam eşitlik kullanıyordu — yani `alpha.edge` altı görselde de `pass` dedi çünkü **öznenin tamamını "kenar" sayıyordu**. Metin kapısını da ayrıca kontrol ediyorum.
+
+=== L528 ===
+Kök neden: **maske ters**. `alpha==254` olan pikseller gri arka plan (171,168,168), `alpha==0` olanlar özne (124,76,45). Matting özneyi silmiş, arka planı bırakmış. İki ayrı gerçek hata var — ikisini de düzeltiyorum.
+
+=== L586 ===
+Kullanıcı mesajı alındı — devam ediyorum. `alpha.edge` artık 6/6 düşüyor: bu, mimarinin uyardığı **gerçek** halo (matting node kenar rengini temizlemiyor). Eşiği gevşetmek yerine kirlenmeyi çözüyorum.
+
+=== L593 ===
+İki gerçek sorun: matting kenar rengini temizlemiyor (%48–62 kirlenme), ve metin kapısı beyaz zemine yassılaştırdığı için beyaz yazıyı kaybediyor. İkisini de çözüyorum.
+
+=== L604 ===
+Şimdi metin kapısının beyaz yazıyı kaybetmesini çözüyorum — tek zemine yassılaştırma yerine iki geçiş.
+
+=== L621 ===
+`alpha.edge` gerçek matte'de 100/0'a geçti, kabul 4/6. Ama iki-zeminli OCR yanlış pozitifi %50'ye çıkardı. Hangi token'lar diye bakıyorum.
+
+=== L627 ===
+Yanlış pozitifler düşük güvenli gürültü (35–45), gerçek sızıntı yüksek (71–83). Ama `anf` (54) gerçek mi karar vermeden eşik değiştirmem — görsele bakıyorum.
+
+=== L635 ===
+Kaleci formasında okunabilir yazı yok — `anf` (54) gürültü. Eşiği ölçülen boşluğa taşıyorum: gerçek sızıntı 71–83, gürültü 32–54.
+
+=== L641 ===
+Beş kapı da gerçek matte çıktısı üzerinde 100/0. Tam partiyi arka planda başlatıp bu arada testleri ve 32 px ölçümünü bitiriyorum.
+
+=== L702 ===
+Parti sürerken temas sayfası aracını yazıyorum — mimari zaten istiyor ve görselleri tek karede görmenin yolu bu.
+
+=== L714 ===
+Temas sayfası çalışıyor — matting temiz, reddedilen portre kırmızı çerçeveli. README'yi güncelliyorum.
+
+=== L754 ===
+Gerçek bir bulgu: beş kart görselinde matting neredeyse her şeyi silmiş, birinde tamamen. Doğruluyorum.
+
+=== L758 ===
+Net ayrım: portre 27/27 ve arma 5/5 sorunsuz; kart görselinin 28'inde 6'sı çökmüş. Runner'a tip bazlı kırılım ekliyorum.
+
+=== L771 ===
+Kart görseli/matting bulgusunu mimariye açık karar olarak işliyorum — armadaki OCR kararıyla aynı sınıfta.
+
+=== L847 ===
+Parti bitişini bekleyen bir izleyici kurdum. Bu arada özet:
+
+**Bu turda çözülenler** — hepsi ölçümle, hiçbiri varsayımla:
+
+| iş | sonuç |
+|---|---|
+| Matting (3b) | BiRefNet + `InvertMask` + kenar dekontaminasyonu · ComfyUI'ye **hiçbir şey kurulmadı** |
+| VRAM tepesi (Gate 0 #2) | **10 744–11 605 MiB / 16 303 MiB**, koşum *sırasında* örneklendi |
+| `alpha.edge` gerçek matte üzerinde | %100 öldürme / %0 yanlış pozitif |
+| Test sayısı | 51/51 (11 brief + 30 kapı + 10 matting) |
+
+**Matting eklenince üç sessiz kusur daha çıktı.** Üçü de hiçbir şeyi patlatmadı:
+
+1. **Maske polaritesi ters bağlıydı.** `RemoveBackground` özneyi `1` işaretliyor, `JoinImageWithAlpha` maskeyi terslliyor — matting **özneyi sildi, arka planı bıraktı**. Ölçüm: `alpha==254` piksellerin RGB'si `[171,168,168]` (düz gri ze
+
+=== L873 ===
+Bu mesajlardaki soruya doğrudan cevap: **5080'deki sprite hattının repo'su `SkyWalker2506/bm-sprite-forge`**, bu makinede `D:\Projects\bm-sprite-forge` (= `~/Projects/bm-sprite-forge`). Bu oturumda matting/kapı/ölçüm işi orada yaşıyor.
+
+Ama daha önemlisi: `docs/design/mockups/friendly-cartoon-v1/` **dört GPT görseli + PROMPTS.md** diyor. Bu, aradığım dört referans olabilir. Bakıyorum.
+
+=== L877 ===
+`touchline-forge-unity` bu makinede yok. GitHub'dan içeriğine bakıyorum — klonlamadan önce dosyalar gerçekten orada mı.
+
+=== L883 ===
+Dört PNG 132 bayt — LFS pointer'ı, ve adları `01-match / 02-card-anatomy / 03-season / 04-squad`: bunlar **ekran mockup'ları**, aradığım dört futbolcu değil. `reference/style/` de hâlâ sadece `PUT-STYLE-REFS-HERE.txt`. PROMPTS.md'de tur kaydı var mı diye bakıyorum.
+
+=== L897 ===
+PROMPTS.md kritik bir şeyi doğruluyor: dört yerde **"the approved player-art sheet"** / **"approved football-character sheet"** diye bir girdiye atıf var — yani dört futbolcu görseli gerçek, adlandırılmış bir sanat-yönü girdisi. Ama iki repoda da **saklanmamış**; `docs/design/reference/style/` hâlâ boş bir `PUT-STYLE-REFS-HERE.txt`.
+
+Kapı koşusunun durumuna bakayım, sonra tam yolu ve sorularımı vereyim.
+
+=== L905 ===
+Kalibrasyon 134 görselin tamamı üzerinde 11 vaka koşuyor — bu saatler sürer. Örneklemi sınırlayıp **neyin atlandığını raporlayacak** şekilde düzeltiyorum (sessiz kırpma yok).
+
+=== L934 ===
+Sorularım net, önce klasör:
+
+## Sprite hattının repo'su
+
+```
+SkyWalker2506/bm-sprite-forge
+```
+
+Bu makinede: `D:\Projects\bm-sprite-forge` (= `~/Projects/bm-sprite-forge`, `~/Projects` → `D:\Projects` symlink). Matting, kapılar, `bm-measured`, `pipeline/`, `ARCHITECTURE.md` hepsi orada. Veri kaynağı yan repo: `D:\Projects\touchline-forge`.
+
+Not: `touchline-forge-unity` bu makinede **yok** — GitHub'dan içeriğine baktım, klonlamadım.
+
+## Dört referansın gideceği yer
+
+```
+D:\Projects\bm-sprite-forge\style\stylized_animation_v1\references\
+```
+
+Yanındaki `_RECORD.md`'de dört kayıt slotu açık, bilinmeyen her alan "kayıt yok" yazıyor. Reddedilen turlar için ayrı dizin: `...\stylized_animation_v1\rejected\`. `pipeline/` `rejected/`'ı hiç okumuyor.
+
+## Aramanın sonucu — ve bir doğrulama
+
+`friendly
+
+=== L942 ===
+İşe yarayan çok şey var burada — üçü doğrudan benim tarafımı ilgilendiriyor. Önce kapı koşusuna bakayım.
+
+=== L948 ===
+Kapı koşusu sürüyor. Bu arada handoff'taki üç şey doğrudan bende karşılık buluyor — ama önce **gerçek bir çelişki** var, sessizce seçmeyeceğim:
+
+=== L954 ===
+İki yön **aynı eksende zıt**: benimki "kalın **koyu** kontur", handoff "cream `#EDE2C8` — **never black**". Bu, STATE.md'nin "stilin imzası" dediği eksen. Birleştirmiyorum — handoff'u ayrı bir paket olarak kuruyorum.
+
+=== L969 ===
+**115/134 kabul.** Ve portrelerin **11'i metin sızıntısından** düştü — yani üretici portrelerin %12'sine yazı basıyor. OCR kapısının varlık sebebi artık bir sayı. Palet kapısını kuruyorum — handoff paleti verdiği için ilk kez kurulabilir.
+
+=== L978 ===
+Şimdi handoff'un asıl dersini koda geçiriyorum: **dosya adı `addressableKey` olacak**, tahminle değil katalogdan.
+
+=== L989 ===
+Test kelime eşleşmesine bağlıymış — davranışı test edecek şekilde düzeltiyorum, ve paletli paket için gerçek bir test ekliyorum.
+
+=== L1012 ===
+Temas sayfası yukarıda. Durum:
+
+## Repo
+
+`SkyWalker2506/bm-sprite-forge` → `D:\Projects\bm-sprite-forge`. Referansların gideceği yer: `style\<packId>\references\`.
+
+## Ürettim
+
+**134/134, 0 başarısız, 134/134 alfa. VRAM tepesi 11 697 MiB / 16 303. Kapılardan 115 kabul.**
+
+| tip | kabul | düşüren |
+|---|---|---|
+| `portrait` | 79/90 | `ocr`×11 |
+| `crest` | 5/5 | — |
+| `cardArt` | 31/39 | `small`×7, `presence`×4, `polarity`×3, `ocr`×2 |
+
+**Portrelerin %12'sine üretici yazı basıyor** — 11/90, negatif prompt'ta `text, letters, words` yazılı olmasına rağmen. Kapı olmasaydı bu 11'i kart üzerinde çift yazıyla basılacaktı. Senin "dosya doğru ≠ ekranda doğru" ayrımının üretim tarafındaki karşılığı bu.
+
+Kalibrasyonu 12 görsele indirdim (134×11 vaka × iki geçişli OCR saatler sürüyordu) ve **atlanan 
+
+=== L1020 ===
+API Error: 529 Overloaded. This is a server-side issue, usually temporary — try again in a moment. If it persists, check https://status.claude.com.
+
+=== L1042 ===
+Özet: **her şey yolunda, iki karar dışında.** Ölçülen her şey (134/134 üretim, 51→54 test, VRAM, kapı oranları) tutarlı ve belgelendi. Açık kalan iki şey — karakter stil referansları eksik, iki stil paketi arasındaki kontur çelişkisi — kod tarafında değil, senin vereceğin kararlar. Şimdi commit atıp push ediyorum.
+
+=== L1061 ===
+İkisi de push edildi.
+
+## Özet — her şey yolunda mı
+
+**Evet, ölçülen her şey tutarlı.** Repoyu tasarım aşamasından ilk gerçek ölçüme taşıdım:
+
+- **134/134 brief üretildi, 0 başarısız, 134/134 alfa taşıyor**, kapılardan **115 kabul**
+- VRAM tepesi ölçüldü: 11 697 MiB / 16 303 (koşum sırasında örneklendi, önceki hatalı tek-örnek ölçümün düzeltilmiş hali)
+- 54/54 test geçiyor
+- Üretim ComfyUI/TRELLIS.2 kurulumuna **hiçbir şey kurulmadı** — sadece HTTP API kullanıldı
+- Bulunan üç sessiz hata (maske polaritesi ters, opak alfa 254≠255, metin kapısı beyaz yazıyı kaçırıyordu) ölçümle bulundu ve düzeltildi, varsayımla değil
+
+**İki açık karar var, ikisi de kod sorunu değil, senin vereceğin karar:**
+
+1. **Karakter stil referansları hâlâ yok** — `reference` dalı bu yüzden koşamıyor, IP-Adapter ağırlığ
+
+=== L1068 ===
+Kontrol ediyorum — 134'lük parti hangi paketle üretildiğini manifest'ten doğrulayacağım, tahmin etmeyeceğim.
+
+=== L1080 ===
+İyi haber önce: **134'lük parti `stylized_animation_v1` ile üretildi** (manifest doğrulandı: `"pack": "stylized_animation_v1"`), yani koyu kontur + turuncu rim. Push edilen commit'teki 115 kabul **kanon dışı değil** — bu eksende zaten doğru pakete oturuyordu. `friendlyCartoon_v1` ile hiç üretim yapmadım; sadece pack.json'ı ve kapı testleri için kullandım. Şimdi o hatalı bilgiyi düzeltiyorum.
+
+=== L1095 ===
+Şimdi prompt, kabul barı ve açık kapılar listesini de düzeltiyorum — hepsi aynı kaynaktan geldi ve aynı hatayı taşıyordu.
+
+=== L1112 ===
+Bunu, gerçek pakete değil sentetik bir pack.json'a bağlıyorum — böylece kapının mantığı, bu paketin veri güvenilirliği sorunundan bağımsız test edilir.
+
+=== L1136 ===
+Push edildi — `b5d7856`.
+
+**Doğrulama:** manifest'ten kontrol ettim — push edilen 134'lük parti (`c1517d5`) **`stylized_animation_v1`** ile üretildi, `friendlyCartoon_v1` ile değil. Yani zaten koyu konturdu; 115 kabulün hiçbiri bu düzeltmeyle geçersizleşmedi. `friendlyCartoon_v1` ile hiç üretim yapmamıştım — pack.json'ı sadece kapı testleri için oluşturmuştum.
+
+Bu repo tarafında yaptığım düzeltme:
+
+- `pack.json`'daki `palette` bloğunu **kaldırdım** (`paletteInvalidated` altına taşıdım), yeni bir "doğru" hex yazmadım — beş örnek noktadan tek bir kontur rengi uydurmak, tam da anlatılan hatanın bir kopyasını daha üretmek olurdu. `palette.conformance` artık bu paket için çekimser.
+- Prompt önizlemesini ve kabul barını geçersiz işaretledim — ikisi de aynı yanlış okumadan türemişti.
+- `_CONFLICT
+
+=== L1142 ===
+Kayıtta. Üç şeye kısa not:
+
+**Branch kararı** — o repo benim çalışma alanım değil, senin ve o oturumun kararı; itiraz etmiyorum.
+
+**`78689a7` yeşil değil** — doğru yaklaşım, "simülasyon yaptım, kanıt değil delil" diye commit mesajına yazmak tam da bu oturumun tekrar tekrar vurguladığı ayrımı koruyor (var olma ≠ çalışma). Play durduğunda gerçek testi koşup düzeltirsin.
+
+**Kontur düzeltmesi benim tarafımda zaten işlendi** — `bm-sprite-forge@b5d7856`: `friendlyCartoon_v1`'in `palette` bloğunu kaldırdım (uydurma "düzeltilmiş" hex yazmadım), kapı testlerini gerçek paketten ayırdım, 55/55 geçiyor. 134'lük parti zaten `stylized_animation_v1` ile üretilmişti, etkilenmedi.
+
+**İki açık karardan biri bende gerçekten aksiyon bekliyor değil, veri bekliyor:** karakter/portre çıpası — henüz üretilmiş bir
+
+=== L1150 ===
+Öncelik sırasına göre, en ucuz/en engelleyiciden başlayarak:
+
+1. **Play Mode duruyor mu, `LocNode` gerçekten doğrulandı mı?** En ucuz kontrol — tek tıkla çözülüyor, önce bunu netleştir.
+
+2. **Karakter/portre çıpası kim, ne zaman, hangi promptla üretecek?** Bu şu an tüm hattı tıkayan tek gerçek engel: 90 portrenin `reference` kipi, IP-Adapter ağırlığı ölçümü, yüz çeşitliliği kanıtı — hepsi buna bağlı. "Built-in image generation" mı üretecek yine, yoksa bu sefer kaynağı (prompt + üretici + tur) baştan mı kaydedilecek? Bir öncekinin kaybolma sebebi tam olarak kayıtsızlıktı.
+
+3. **Off-canon 4 varlık yeniden üretilirken koyu kontur mu kullanılıyor, düzeltilmiş prompt nerede duruyor?** `PROMPTS.md` bilerek "tarihsel kayıt" olarak bırakılmış — yeni üretim hangi dosyadan prompt okuyor, emin ol.
+
+4
+
+=== L1159 ===
+**Yerel diskte, git'e girmedi.**
+
+```
+D:\Projects\bm-sprite-forge\out\stylized_animation_v1\20260729T213706\
+```
+
+134 PNG + her biri için `.receipt.json` + `manifest.json` + `gate-report.json` + `crop-study.json` + `_contact-sheet.png` (sana gönderdiğim temas sayfası bu dizinde).
+
+Bu ve öncesindeki 4 deneme koşumu (`20260729T204932` ile `20260729T213307` arası) toplam **174 MB**, hepsi `out/` altında.
+
+**Bilerek commit'lemedim** — `.gitignore`'a yazdım. Sebep: `RetentionPolicy@1` terimleriyle bunlar `keep-local`, kesin değil; kapıdan geçmiş 115 görsel bile **dondurulmuş** değil (dondurma aşaması hâlâ yazılmadı) ve `styleAuthority: none` taşıyorlar — yani hiçbiri stil otoritesi taşımıyor, kalıcı bir teslimat değil, sadece hattın mekaniğinin ölçümü.
+
+Görmek istersen `tools/contact_sheet.py`'
+
+=== L1168 ===
+Cloneluyorum ve tam belgeleri okuyorum — tahmin etmeden, tek slotlu kart görselinin hangisi olduğunu ve tam prompt bağlamını görmem lazım.
+
+=== L1207 ===
+Gerçek görseller, LFS'ten geldi. Önce kendi ölçümümü koşuyorum — rapor edilen sonucu tekrarlamadan güvenmiyorum.
+
+=== L1226 ===
+Canonik mockup'larda gerçek bir karakter illüstrasyonu buldum — Okonkwo (gol kutlaması). Bu, metinden tarif etmekten çok daha iyi bir referans. Kırpıp gerçek referans olarak kaydediyorum.
+
+=== L1264 ===
+Şimdi tüm dosyayı ikinci düzeltme turuna göre yeniden yazıyorum — bu tur artık gerçek referanslar var ve prompt düzeltildi.
+
+=== L1302 ===
+Görsellere bakınca ciddi sorunlar var — ikonlar tamamen yanlış konu üretmiş, armada metin sızmış. Kör güvenmiyorum, ölçüyorum.
+
+=== L1309 ===
+Kök neden bulundu: hiçbir arka plan gerçek magenta'ya yakın değil (en yakın köşe rengi `(111,29,72)`, `#FF00FF`'ten mesafe ~234) — bu checkpoint düz renk arka plan talimatına uymuyor. Ayrıca ikonlar tamamen yanlış konu üretti (fotogerçekçi yüz/bot). Chroma key'i terk edip bu repoda zaten kanıtlanmış BiRefNet+dekontaminasyon yöntemine geçiyorum, ve negatif prompt'u fotogerçekçiliğe karşı güçlendiriyorum.
+
+=== L1346 ===
+İkisi (trigger, cardArt) BiRefNet tarafından neredeyse tamamen silinmiş — ince çizgili/seyrek içerikte "belirgin nesne" modeli aynı hatayı burada da yapıyor (bu oturumda daha önce ölçülen kart-görseli çöküşünün aynısı). Ham çıktıyı da kaydedip karşılaştırıyorum.
+
+=== L1370 ===
+İki gerçek üretim başarısızlığı: whistle ve pitch diyagramı model tarafından neredeyse boş/soyut çizgiler olarak üretilmiş — matting kusuru değil, üretim kusuru. Konu satırlarını güçlendirip sadece bu ikisini yeniden deniyorum.
+
+=== L1389 ===
+Trigger ikonu bu turda başarılı — düdük, net kontur, saydam zemin. `CardArt/generic` bu sefer farklı şekilde başarısız oldu: tamamen fotogerçekçi bir top/çim fotoğrafı üretti. Üçüncü ve son denemeyi yapıyorum, sonra ne olursa olsun durup rapor vereceğim.
+
+=== L1440 ===
+Good — provenance JSON'ları her varlıkla birlikte var. CardArt_generic.png kalitesizdi (3. deneme, ok yok top yok), o yüzden onu hariç tutuyorum. Şimdi teslim edilecek 3 katalog varlığını Unity reposuna, 3 karakter çıpasını da bm-sprite-forge referanslarına kopyalıyorum.
+
+=== L1479 ===
+bm-sprite-forge push edildi. Şimdi Unity reposunu commit'liyorum — burada dikkatli olmam gerekiyor, bu paylaşılan bir repo ve `.meta` dosyaları yok.
+
+=== L1493 ===
+Remote'ta yeni commit'ler var — muhtemelen Mac tarafındaki oturum bir şey push etti. Önce inceliyorum, kör merge yapmıyorum.
+
+=== L1509 ===
+Her ikisi de push edildi. Özet:
+
+## Sonuç: 6/7 teslim edildi, 1 dürüstçe başarısız
+
+**Unity reposu** (`touchline-forge-unity@47ebe95`, rebase ile temiz merge oldu — Mac tarafı bu arada `upstream-art-slots.md`'yi ve yeni capture'ları push etmişti, çakışma yok):
+
+| dosya | durum |
+|---|---|
+| `Icons/trigger.png` | ✅ 2. denemede — 1. deneme fotogerçekçi bir yüz üretmişti |
+| `Icons/training.png` | ✅ 1. denemede |
+| `Crests/northbridge.png` | ✅ 2. denemede — 1. denemede forma üzerine "CLEFFTX" sızmıştı |
+| `CardArt/generic.png` | ❌ **teslim edilmedi** — 3 deneme, 3 farklı başarısızlık (boş çizikler → tam fotogerçekçi top/çim fotoğrafı → toplu değil sadece çapraz oklar). Üretilmiş-ama-yanlış dosyayı katalog adresine koymamak, bu projenin tekrar tekrar kaçındığı hata |
+
+`stylePack` çevrilmedi, p
+
+=== L1515 ===
+Ölçümlerini aynen kabul ediyorum ve haklısınız — üç görsel de yanlış konu. Önce paylaşılan repoyu düzeltiyorum (bu zaman açısından hassas), sonra konu doğrulama kapısını kuruyorum.
+
+=== L1524 ===
+Şimdi zaten arşivlenmiş dört eski off-canon dosyayı `Resources/`'tan temizliyorum — build'e giriyorlar ve içerikleri `off-canon-cream-v0/`'da zaten duruyor.
+
+=== L1553 ===
+Kendi ölçümüm farklı sonuç veriyor — CLIP'e göre mevcut dosyalar konsepte daha yakın çıktı. Sessizce çelişkiyi görmezden gelmiyorum; push edilen tam byte'ları kontrol ediyorum.
+
+=== L1557 ===
+Bunlar LFS pointer'ları, gerçek görsel değil — yanlış karşılaştırma yaptım. Doğru şekilde çıkarıyorum.
+
+=== L1561 ===
+Hash'ler birebir aynı — dosya karışıklığı yok, aynı byte'lara bakıyoruz. Anlaşmazlık yorumda. Taze gözle tekrar bakıyorum.
+
+=== L1571 ===
+Taze bakışla nüans netleşti: `trigger` gerçekten yanlış (ampul/pompa şeklinde, düdük değil — CLIP de bunu doğruladı: ampul 0.32, düdük 0.23). `crest` de yanlış (taç+kartal+çizgili kalkan+"CFB" metni — istenen köprü+top+defne değil). `training` konusu aslında bot (kategori doğru) ama istenen hareket okunu taşımıyor ve gerçek bir Adidas-üç-şerit deseni var — "tamamen fotogerçekçi" değil ama yine de gönderilmemeliydi. Revert kararınız her üçü için de doğruydu, farklı gerekçelerle. Şimdi kapıyı kuruyorum — ve CLIP'in kendi sınırını da dürüstçe kaydediyorum: crest vakasında CLIP'in kendisi de yanılıyor (köprü'yü kartal'dan daha yüksek puanladı), yani bu kapı kaba kategori hatalarını yakalar, ince heraldik ayrımı yakalamaz.
+
+=== L1595 ===
+Şimdi eşiği gerçek üç veri noktasına göre kalibre ediyorum: kabul (0,067), yanlış-ama-yüksek-güvenli crest hatası (0,051), gerçek yakalama (0,083).
+
+=== L1603 ===
+6/6 geçiyor. Şimdi bunu `generate_fixed.py` teslim akışına bağlıyorum, ve metin kapısının armadaki "CFB" gibi metinleri en azından kanıt olarak yüzeye çıkarmasını sağlıyorum.
+
+=== L1634 ===
+OCR bu spesifik dosyada hâlâ hiçbir şey bulamadı — banner metni stilize/serif ve düşük kontrast, tesseract'ın alıştığı düz UI yazısından farklı. Hızlıca daha düşük güvenle deniyorum, sonra durumu olduğu gibi kaydedeceğim.
+
+=== L1640 ===
+OCR tesseract'ın gerçekten okuyamadığını doğruladı — çoklu PSM modunda da gürültü dönüyor, "CFB" değil. Bunu olduğu gibi kaydediyorum, zorlamıyorum. Şimdi belgeleri güncelleyip commit atıyorum.
+
+=== L1678 ===
+`Resources/Art/` artık tamamen temiz — sadece boş klasör `.meta` dosyaları kaldı, hiçbir yanlış varlık yok. Özet:
+
+## Kabul ediyorum — üçü de yanlış konuydu
+
+Bağımsız doğruladım, kopyalamadım: pushed byte'ları `git show <commit>:<path> | git lfs smudge` ile çıkarıp SHA256'sını yerel dosyalarımla karşılaştırdım — **birebir aynı**, yani sorun kopyalamada değil üretimdeydi. Taze gözle tekrar baktım ve CLIP zero-shot ile skorladım: `Icons/trigger` için ampul 0,318 > düdük 0,235 — gerçekten ampul.
+
+**Nüans:** `training.png` benim taze bakışımda "fotogerçekçi" değil, cel-shaded bir bot — kategori doğru ama istenen hareket oku yok ve gerçek bir Adidas-üç-şerit deseni var. Farklı gerekçeyle de olsa, sonuç aynı: gönderilmemeliydi.
+
+## Yaptım
+
+- **`touchline-forge-unity`**: `47ebe95` `git revert` ed
+
+=== L1690 ===
+İkisi de temiz, iş yığılmadı. `9287782` bu makinede yok (Mac'in kendi klonunda, push edilmemiş) — onu ben pushlamıyorum, sizin kararınız.
+
+`training.png` gerekçesini kabul ettiğiniz için teşekkürler — bir sonraki turda o iki dosyanın hangi konu satırının düzeltileceğini bu ayrım belirleyecek: "krampon+ok, dokusuz düz dolgu" (Adidas deseni ve deri dokusu ikisi de aynı kökten, "no painted texture, no rendered detail" kuralının yeterince zorlanmamasından geliyor).
+
+Slot ataması bende değil — `bm-ui-authoring`'in kararı, ve haklısınız: o karar gelmeden üretim yapmanın net getirisi sıfır, bu turda ölçüldüğü gibi. `bm-sprite-forge` tarafında bekleyen bir şey yok; `subject_gate` kuruldu, testler yeşil, iki repo da senkron. Slot kararı ya da yeni bir kanon çıpası gelirse devam ederim.
+
+=== L1717 ===
+Referanslar çok net. Unity sürümü de tam eşleşiyor (6000.4.3f1) — bu tur gerçek `.meta` dosyalarını Unity Editor ile üretmeyi deneyeceğim. Önce referansları ve prompt'u güncelliyorum.
+
+=== L1763 ===
+4/4 üretildi. Şimdi round 2'nin öğrettiği disiplinle görsel denetim yapıyorum — önce ham çıktıları da kontrol edeceğim.
+
+=== L1776 ===
+Round 3 de başarısız — üçü de yine yanlış konu, hatta training'de photoreal + logo benzeri işaret var. Portre çıpası iyi ama "no badge" talimatına rağmen sahte bir forma arması eklemiş. Subject_gate ile resmi ölçüm alıyorum.
+
+=== L1787 ===
+Portre çıpası saydamlık ve üslup açısından iyi (canon'a çok yakın) ama "no badge" talimatına rağmen sahte bir arma eklemiş — bunu da kayda geçiriyorum. Üç ardışık turda aynı üç hedef (düdük/bot/arma) aynı checkpoint'le başarısız oldu; bu artık prompt sorunu değil, checkpoint sınırı gibi görünüyor. Belgeliyorum ve dördüncü bir deneme yapmadan durup rapor veriyorum.
+
+=== L1792 ===
+Şimdi STATE.md'ye round 3'ün özetini ekliyorum, referans klasörünü düzenliyorum, testleri koşup commit atıyorum.
+
+=== L1814 ===
+Test kırılganlığı — `base_image` fixture'ı artık round 3'ün portre çıpasını seçmiş, ve bu görsel kenara kadar dolu (kenar boşluğu yok), polarite kapısının varsaydığı kompozisyonu bozuyor. Gate kusuru değil, fixture kırılganlığı. Düzeltiyorum.
+
+=== L1837 ===
+Şimdi commit atıyorum — bu round'da Unity reposuna hiçbir şey gitmiyor, hepsi bm-sprite-forge tarafında.
+
+=== L1845 ===
+Push edildi (`79029ea`). Özet:
+
+## Round 3: 3 katalog hedefi yine yanlış, hiçbiri gönderilmedi
+
+Referanslar mükemmel — `01-match.png`'den hassas kırpımlar (`portrait-token-okonkwo.png` 78×98, sahne figürleri 222×95), kontur kuralı **üçüncü kez** bağımsız doğrulandı. Prompt düzeltildi (mid-gri zemin, açık fotogerçekçilik/marka negatifleri). Ama sonuç:
+
+| hedef | round 2 | round 3 |
+|---|---|---|
+| `Icons/trigger` | ampul/pompa | **çakmak/dudak kremi tüpü** (CLIP: çakmak 0,308 > düdük 0,256), fotogerçekçi krom render |
+| `Icons/training` | fotoğraf gibi bot, ok yok | **yine fotogerçekçi**, "no photographic realism" işe yaramadı, hâlâ ok yok |
+| `Crests/northbridge` | taç+kartal+yazı | **yine kartal/anka temalı** (CLIP: anka 0,299, kartal 0,289, ikisi de köprü'nün 0,282 üzerinde) — defne dall
+
+=== L1851 ===
+Kabul ediyorum — ve bu benim de payıma düşen bir kaçırma: `docs/production/upstream-art-slots.md`'yi round 2'nin sonunda zaten okumuştum, "icon-trigger sınıfı hiçbir yerde yok" orada açıkça yazıyordu. Round 3'te görevi aldığımda slot durumunu yeniden kontrol etmeden üretime geçtim. Kaydı düzeltip kapatıyorum.
+
+=== L1866 ===
+Push edildi (`9d5411c`). Kayıt doğru: pack üzerinde bekleyen bir SDXL turu yok, sıra `bm-ui-authoring`'de. `Crests/northbridge` için GPT prompt'u istersen — canon kırpımlar ve düzeltilmiş kontur kuralı zaten `bm-sprite-forge/style/friendlyCartoon_v1/references/` altında, hazır olduğunda kullanabilirsin.
+
+=== L1887 ===
+Prompt'u hazırlıyorum — SDXL için gerekli olan macenta/chroma iş-arounds'ı çıkarıyorum, çünkü o sadece SDXL'in düz zemin sorunundandı; GPT'nin kendi transparency desteği var.
+
+=== L1912 ===
+Push edildi (`1c31382`). Prompt hazır: [`style/friendlyCartoon_v1/GPT-PROMPT-crest-northbridge.md`](style/friendlyCartoon_v1/GPT-PROMPT-crest-northbridge.md)
+
+**İçeriği:**
+- Kopyala-yapıştır prompt — üç turda gerçekten üretilen yanlış şeyleri (taç, kartal/anka, kurdele/parşömen, yazı) adıyla yasaklıyor
+- Macenta/chroma-key **kaldırıldı** — o SDXL'e özgü bir çözümdü (SDXL düz renk zeminde hiç başarılı olmadı, en yakın çıktı `#FF00FF`'ten ~234 mesafedeydi), GPT için gereksiz karmaşıklık. Doğrudan "transparent background" isteniyor, olmazsa bu repodaki BiRefNet+dekontaminasyon zinciri yedek
+- Teslimden önceki 3 soruluk görsel denetim listesi + çalıştırılabilir kapı komutları (`subject_gate`, `text_gate`, `alpha_gate`, `readability_gate` — arma için eşik 32 değil 24) + bağımsız kontur ölçüm ko
+
+=== L1928 ===
+İyi haber: eşik 24px'te de gerçekten ayrışıyor (kötü 0,886 vs iyi 33,132, eşik 6,0) — ama bu ölçüm şimdiye kadar hiç yapılmamıştı, ben de sizin belirttiğiniz ana kadar varsaymıştım. Şimdi test olarak sabitliyorum ve prompt'taki iki hatayı düzeltiyorum.
+
+=== L1951 ===
+Şimdi `Icons/training` konusunu düzeltiyorum — "terk edildi" değil, "bekleyen bir yukarı akış kararı var".
+
+=== L1980 ===
+Push edildi (`d537531`). Üçü de düzeltildi:
+
+1. **Ortam önkoşulu** — GPT prompt belgesine, kapı komutlarının yalnız bu makinedeki `sprite-tools` venv'inde çalıştığını, başka bir makinede `numpy` eksikse dördünün `ImportError`'la susacağını ve bunun "geçti" değil "hiç koşmadı" anlamına geldiğini açıkça yazdım.
+
+2. **24px eşiği** — gerçekten hiç ölçülmemiş, haklısınız. Şimdi ölçtüm: aynı bilinen-iyi/bilinen-kötü çift 24/32/64 piksellerin üçünde de eşiği (6,0) net ayırıyor. Bunu `test_readability_threshold_holds_at_non_default_sizes` olarak sabitledim ve kapının kendi docstring'ine "yeni bir boyut eklenirse ölçülmeden güvenilmesin" notunu yazdım.
+
+3. **`Icons/training`** — haklısınız, sizin "kategori ikonlarının slotu yok" tespitinizi genelleyip düğüm ikonuna da uyguladım. Onu "terk edildi"de
+
+=== L1986 ===
+Haklısınız — `STATE.md` kendi başlığında "her teslimde güncellenir" diyor ve bu karar oraya düşmedi. Düzeltiyorum.
+
+=== L2004 ===
+Push edildi (`3e2721d`). `STATE.md`'nin en üstüne "Açık kararlar" bölümü eklendi — artık dosyanın kendi başlığı ile içeriği tutarlı: bir sonraki oturum sadece bu dosyayı okusa bile üç bekleyen kararı (düğüm ikonu granülaritesi, GPT crest prompt'u, ürün kararları) ilk satırlarda görür.
+
+Sekizinci kusur da aynı aileden — "var mı" sorusu, "geçerli mi" sorusu değil, bu sefer benim kendi belgemde. Şu an bende bekleyen bir iş yok.
+
